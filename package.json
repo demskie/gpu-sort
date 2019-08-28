@@ -1,0 +1,90 @@
+{
+	"name": "gpu-sort",
+	"version": "0.0.1",
+	"description": "gpu accelerated stable sort",
+	"main": "lib/index.js",
+	"scripts": {
+		"build": "tsc && jest --coverage",
+		"test": "tsc --noEmit && jest --coverage"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/demskie/gpu-sort.git"
+	},
+	"files": [
+		"lib/**/*"
+	],
+	"keywords": [
+		"sort",
+		"radix",
+		"gpu",
+		"gpgpu",
+		"compute",
+		"webgl",
+		"glsl",
+		"shader"
+	],
+	"author": "Alex Demskie",
+	"license": "MIT",
+	"homepage": "https://github.com/demskie/gpu-sort#readme",
+	"bugs": {
+		"url": "https://github.com/demskie/gpu-sort/issues"
+	},
+	"typings": "lib/index.d.ts",
+	"jest": {
+		"roots": [
+			"<rootDir>/src"
+		],
+		"transform": {
+			"^.+\\.(ts|tsx)$": "ts-jest"
+		},
+		"testRegex": [
+			".*.test\\.ts"
+		],
+		"moduleFileExtensions": [
+			"ts",
+			"js",
+			"json",
+			"node"
+		],
+		"globals": {
+			"ts-jest": {
+				"tsConfig": "tsconfig.json",
+				"diagnostics": false
+			}
+		},
+		"testPathIgnorePatterns": [
+			"<rootDir>/node_modules/",
+			"<rootDir>/config/",
+			"<rootDir>/build/",
+			"<rootDir>/src/mockdata/",
+			"<rootDir>/src/benchmarks/"
+		],
+		"collectCoverage": false,
+		"collectCoverageFrom": [
+			"!**/*.bench.ts",
+			"!**/*.mock.ts",
+			"!**/node_modules/**",
+			"!**/vendor/**",
+			"**/*.ts"
+		]
+	},
+	"devDependencies": {
+		"@types/benchmark": "^1.0.31",
+		"@types/jest": "^24.0.18",
+		"@types/node": "^12.7.2",
+		"@typescript-eslint/eslint-plugin": "^2.0.0",
+		"@typescript-eslint/parser": "^2.0.0",
+		"benchmark": "^2.1.4",
+		"coveralls": "^3.0.6",
+		"eslint": "^6.2.2",
+		"eslint-config-prettier": "^6.1.0",
+		"eslint-plugin-prettier": "^3.1.0",
+		"jest": "^24.9.0",
+		"prettier": "^1.18.2",
+		"ts-jest": "^24.0.2",
+		"ts-node": "^8.3.0",
+		"typescript": "^3.5.3"
+	},
+	"dependencies": {}
+}

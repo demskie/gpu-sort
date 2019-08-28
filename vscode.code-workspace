@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.detectIndentation": false,
+		"editor.tabSize": 2,
+		"editor.insertSpaces": true,
+		"jest.runAllTestsFirst": true,
+		"jest.debugMode": true,
+		"jest.pathToConfig": "package.json",
+		"coverage-gutters.showGutterCoverage": false,
+		"coverage-gutters.showLineCoverage": true,
+		"coverage-gutters.showRulerCoverage": false,
+		"coverage-gutters.coverageFileNames": ["coverage/lcov.info"],
+		"coverage-gutters.highlightdark": "rgba(45, 121, 10, 0.2)"
+	}
+}
