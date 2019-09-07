@@ -1,24 +1,21 @@
 let path = require("path");
+let nodeExternals = require("webpack-node-externals");
 
 const distConfig = {
-  // Change to your "entry-point".
+  name: "dist",
+  target: "web",
+  mode: "production",
   entry: "./src/index",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "app.bundle.js"
+    filename: "dist.bundle.js"
   },
-
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".json", ".frag", ".vert", ".glsl"]
+    extensions: [".ts", ".js", ".json"]
   },
-
-  // https://github.com/webpack-contrib/css-loader/issues/447
-  node: { fs: "empty" },
-
   module: {
     rules: [
       {
-        // Include ts, tsx, js, and jsx files.
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: "babel-loader"
@@ -32,25 +29,22 @@ const distConfig = {
   }
 };
 
-const testConfig = {
-  // Change to your "entry-point".
-  entry: "./src/tests/index.test.ts",
+const libConfig = {
+  name: "lib",
+  target: "node",
+  mode: "production",
+  entry: "./src/index",
   output: {
-    path: path.resolve(__dirname, "test"),
-    filename: "app.bundle.js"
+    path: path.resolve(__dirname, "lib"),
+    filename: "lib.bundle.js"
   },
-
+  externals: [nodeExternals()],
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".json", ".frag", ".vert", ".glsl"]
+    extensions: [".ts", ".js", ".json"]
   },
-
-  // https://github.com/webpack-contrib/css-loader/issues/447
-  node: { fs: "empty" },
-
   module: {
     rules: [
       {
-        // Include ts, tsx, js, and jsx files.
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: "babel-loader"
@@ -65,24 +59,21 @@ const testConfig = {
 };
 
 const benchConfig = {
-  // Change to your "entry-point".
+  name: "bench",
+  target: "node",
+  mode: "development",
   entry: "./src/benchmarks/index.bench.ts",
   output: {
     path: path.resolve(__dirname, "bench"),
-    filename: "app.bundle.js"
+    filename: "bench.bundle.js"
   },
-
+  externals: [nodeExternals()],
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".json", ".frag", ".vert", ".glsl"]
+    extensions: [".ts", ".js", ".json"]
   },
-
-  // https://github.com/webpack-contrib/css-loader/issues/447
-  node: { fs: "empty" },
-
   module: {
     rules: [
       {
-        // Include ts, tsx, js, and jsx files.
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: "babel-loader"
@@ -96,4 +87,33 @@ const benchConfig = {
   }
 };
 
-module.exports = [distConfig, testConfig, benchConfig];
+const testConfig = {
+  name: "test",
+  target: "node",
+  mode: "development",
+  entry: "./src/tests/index.test.ts",
+  output: {
+    path: path.resolve(__dirname, "test"),
+    filename: "test.bundle.js"
+  },
+  externals: [nodeExternals()],
+  resolve: {
+    extensions: [".ts", ".js", ".json"]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(frag|vert|glsl)$/i,
+        exclude: /node_modules/,
+        loader: "raw-loader"
+      },
+      {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      }
+    ]
+  }
+};
+
+module.exports = [distConfig, libConfig, benchConfig, testConfig];

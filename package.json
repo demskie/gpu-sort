@@ -4,19 +4,18 @@
   "description": "gpu accelerated stable sort",
   "main": "lib/index.js",
   "scripts": {
-    "test": "tsc --noEmit && jest --coverage",
-    "build": "tsc --emitDeclarationOnly && babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
-    "pretest": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline --copy-files",
-    "bundle": "webpack",
-    "bench": "npm run bench-index",
-    "bench-index": "ts-node-dev src/benchmarks/index.bench.ts"
+    "bundle": "webpack --progress",
+    "bench": "webpack --silent --progress --config-name bench && node bench/bench.bundle.js",
+    "test": "webpack --silent --progress --config-name test && node test/test.bundle.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/demskie/gpu-sort.git"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "bench/**/*",
+    "test/**/*"
   ],
   "keywords": [
     "sort",
@@ -35,69 +34,20 @@
     "url": "https://github.com/demskie/gpu-sort/issues"
   },
   "typings": "lib/index.d.ts",
-  "jest": {
-    "maxConcurrency": 1,
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "testRegex": [
-      ".*.test\\.ts"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json",
-      "txt",
-      "glsl",
-      "frag",
-      "vert",
-      "node"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "ts-jest",
-      "\\.txt$": "jest-raw-loader",
-      "\\.frag$": "jest-raw-loader",
-      "\\.vert$": "jest-raw-loader",
-      "\\.glsl$": "jest-raw-loader"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsConfig": "tsconfig.json",
-        "diagnostics": false
-      }
-    },
-    "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/config/",
-      "<rootDir>/build/",
-      "<rootDir>/src/mockdata/",
-      "<rootDir>/src/benchmarks/"
-    ],
-    "collectCoverage": false,
-    "collectCoverageFrom": [
-      "!**/*.bench.ts",
-      "!**/*.mock.ts",
-      "!**/node_modules/**",
-      "!**/vendor/**",
-      "**/*.ts"
-    ]
-  },
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-numeric-separator": "^7.2.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
+    "@babel/preset-env": "^7.6.0",
+    "@babel/preset-typescript": "^7.6.0",
     "@types/benchmark": "^1.0.31",
-    "@types/jest": "^24.0.18",
     "@types/node": "^12.7.2",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "babel-loader": "^8.0.4",
     "benchmark": "^2.1.4",
-    "coveralls": "^3.0.6",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-import": "^2.18.2",
@@ -106,16 +56,13 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "gpu-compute": "0.0.36",
-    "jest": "^24.9.0",
-    "jest-raw-loader": "^1.0.1",
     "prettier": "^1.18.2",
     "raw-loader": "^3.1.0",
-    "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
-    "ts-node-dev": "^1.0.0-pre.42",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7"
+    "webpack-cli": "^3.3.7",
+    "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {}
 }

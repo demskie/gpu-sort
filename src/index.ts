@@ -1,4 +1,5 @@
 import * as shared from "./shared";
+import * as shaders from "./shaders/shaders";
 import * as sort from "./shaders/bitonicsort/bitonicsort";
 
 function bitonicSort(array: shared.SortableTypedArrays) {
@@ -53,4 +54,8 @@ export function sortBigInt64Array(array: BigInt64Array) {
 export function sortBigUint64Array(array: BigUint64Array) {
   if (array.constructor.name === "BigUint64Array") return bitonicSort(array);
   throw new Error("array parameter was not a BigUint64Array");
+}
+
+export function precompile() {
+  shaders.initializeShaders();
 }
