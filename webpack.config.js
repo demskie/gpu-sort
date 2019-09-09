@@ -1,5 +1,7 @@
-let path = require("path");
-let nodeExternals = require("webpack-node-externals");
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const path = require("path");
+const nodeExternals = require("webpack-node-externals");
 
 const distConfig = {
   name: "dist",

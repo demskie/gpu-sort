@@ -31,20 +31,20 @@ export function bitonicSort(bytes: gpu.RenderTarget, constructorName: string) {
     });
 }
 
-enum TRANSFORM_MODE {
+export enum TRANSFORM_MODE {
   PASSTHROUGH = 0,
   INTEGER = 1,
   FLOAT = 2
 }
 
-interface bitonicParameters {
+export interface bitonicParameters {
   mode: TRANSFORM_MODE;
   sortShader: gpu.ComputeShader;
   transformShader: gpu.ComputeShader;
   untransformShader: gpu.ComputeShader;
 }
 
-function getParameters(constructorName: string) {
+export function getParameters(constructorName: string) {
   let mode: TRANSFORM_MODE;
   let sortShader: gpu.ComputeShader;
   let transformShader: gpu.ComputeShader;
@@ -104,14 +104,14 @@ function getParameters(constructorName: string) {
   return { mode, sortShader, transformShader, untransformShader } as bitonicParameters;
 }
 
-interface bitonicUniforms {
+export interface bitonicUniforms {
   blockSizeX: number;
   blockSizeY: number;
   regionSizeX: number;
   regionSizeY: number;
 }
 
-function calculateBitonicUniforms(width: number) {
+export function calculateBitonicUniforms(width: number) {
   const arr = [] as bitonicUniforms[];
   for (var rs = 4; rs <= 2 * width * width; rs *= 2) {
     for (var bs = rs / 2; bs > 1; bs /= 2) {

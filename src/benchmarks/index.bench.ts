@@ -1,68 +1,73 @@
+import * as gpu from "gpu-compute";
 import * as index from "../index";
-// import * as Benchmark from "benchmark";
+import * as shared from "../shared";
+import * as sort from "../shaders/bitonicsort/bitonicsort";
 
 index.precompile();
 
 for (var width of [256, 512, 1024, 2048, 4096].values()) {
-  console.log(`dimensions: ${width} x ${width}`);
+  console.log(`dimensions:\t\t${width} x ${width}`);
+  emptyBitonicSort(width);
+  sortUint32Array();
+  cpuFloat32Array();
+  cpuArray();
+}
 
+function emptyBitonicSort(width: number) {
+  let start = Date.now();
+  const bytes = new gpu.RenderTarget(width);
+  const params = sort.getParameters("Uint32Array");
+  if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
+    bytes.compute(params.transformShader, {
+      u_bytes: bytes,
+      u_width: bytes.width,
+      u_mode: params.mode,
+      u_endianness: shared.isLittleEndian ? 0 : 1
+    });
+  const uniforms = sort.calculateBitonicUniforms(bytes.width);
+  for (var i = 0; i < uniforms.length; i++) {
+    bytes.compute(params.sortShader, {
+      u_bytes: bytes,
+      u_width: bytes.width,
+      u_blockSizeX: uniforms[i].blockSizeX,
+      u_blockSizeY: uniforms[i].blockSizeY,
+      u_regionSizeX: uniforms[i].regionSizeX,
+      u_regionSizeY: uniforms[i].regionSizeY
+    });
+  }
+  if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
+    bytes.compute(params.untransformShader, {
+      u_bytes: bytes,
+      u_width: bytes.width,
+      u_mode: params.mode,
+      u_endianness: shared.isLittleEndian ? 0 : 1
+    });
+  bytes.readSomePixels(0, 0, 0, 1);
+  console.log(`gpu.sortEmpty\t\t${Date.now() - start}ms`);
+}
+
+function sortUint32Array() {
   var gpuUint32Array = new Uint32Array(width * width);
   gpuUint32Array.set(Array.from(Array(width * width), () => Math.random() * 0xffffffff));
 
   let start = Date.now();
   index.sortUint32Array(gpuUint32Array);
-  console.log(`finished gpu.sortUint32Array() in: \t${Date.now() - start}ms`);
+  console.log(`gpu.sortUint32Array\t${Date.now() - start}ms`);
+}
 
-  var gpuFloat32Array = new Float32Array(width * width);
-  gpuFloat32Array.set(Array.from(Array(width * width), () => Math.random() * 0xffffffff));
-
-  start = Date.now();
-  index.sortFloat32Array(gpuFloat32Array);
-  console.log(`finished gpu.sortFloat32Array() in: \t${Date.now() - start}ms`);
-
+function cpuFloat32Array() {
   var cpuFloat32Array = new Float32Array(width * width);
   cpuFloat32Array.set(Array.from(Array(width * width), () => Math.random() * 0xffffffff));
 
-  start = Date.now();
+  let start = Date.now();
   cpuFloat32Array.sort((a, b) => a - b);
-  console.log(`finished Float32Array.sort() in: \t${Date.now() - start}ms`);
-
-  var cpuArray = Array.from(Array(width * width), () => Math.random() * 0xffffffff);
-
-  start = Date.now();
-  cpuArray.sort((a, b) => a - b);
-  console.log(`finished Array.sort() in: \t\t${Date.now() - start}ms\n`);
+  console.log(`Float32Array.sort()\t${Date.now() - start}ms`);
 }
 
-//
-// var gpuFloat32Array = new Float32Array(number);
-// var cpuFloat32Array = new Float32Array(number);
-// var cpuArray = new Array(number);
-//
-// new Benchmark.Suite("index.bench.ts")
-//
-//   .add("Float64Array (gpu)", () => {
-//     gpuFloat32Array.set(Array.from(Array(number), () => Math.random() * 0xffffffff));
-//     index.sortFloat32Array(gpuFloat32Array);
-//   })
-//
-//   .add("Float64Array (cpu)", () => {
-//     cpuFloat32Array.set(Array.from(Array(number), () => Math.random() * 0xffffffff));
-//     cpuFloat32Array.sort((a, b) => a - b);
-//     // cpuFloat64Array.sort();
-//   })
-//
-//   .add("Array (cpu)", () => {
-//     cpuArray = Array.from(Array(number), () => Math.random() * 0xffffffff);
-//     cpuArray.sort((a, b) => a - b);
-//     // cpuFloat64Array.sort();
-//   })
-//
-//   .on("complete", function() {
-//     console.log(`'${this.name}' output:`);
-//     this.forEach((bench: Benchmark) => {
-//       console.log(bench.toString());
-//     });
-//   })
-//
-//   .run();
+function cpuArray() {
+  var cpuArray = Array.from(Array(width * width), () => Math.random() * 0xffffffff);
+
+  let start = Date.now();
+  cpuArray.sort((a, b) => a - b);
+  console.log(`Array.sort()\t\t${Date.now() - start}ms\n`);
+}

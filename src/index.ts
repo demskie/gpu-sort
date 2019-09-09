@@ -3,7 +3,7 @@ import * as shaders from "./shaders/shaders";
 import * as sort from "./shaders/bitonicsort/bitonicsort";
 
 function bitonicSort(array: shared.SortableTypedArrays) {
-  if (array.length < 256) return array.set(shared.insertionSort(array) as any);
+  if (!gpuProcessingEnabled || array.length < 256 * 256) return shared.nativeSort(array);
   const bytes = new Uint8Array(array.buffer);
   const target = shared.createRenderTarget(bytes);
   sort.bitonicSort(target, array.constructor.name);
@@ -15,6 +15,8 @@ function bitonicSort(array: shared.SortableTypedArrays) {
   }
   target.delete();
 }
+
+export function sortByNumber(array: any[], getter: (elem: any) => number) {}
 
 export function sortInt16Array(array: Int16Array) {
   if (array.constructor.name === "Int16Array") return bitonicSort(array);
@@ -56,6 +58,9 @@ export function sortBigUint64Array(array: BigUint64Array) {
   throw new Error("array parameter was not a BigUint64Array");
 }
 
-export function precompile() {
-  shaders.initializeShaders();
-}
+export const precompile = () => shaders.initializeShaders();
+
+var gpuProcessingEnabled = true;
+export const disableGPU = () => (gpuProcessingEnabled = false);
+export const enableGPU = () => (gpuProcessingEnabled = true);
+export const isGPUEnabled = () => gpuProcessingEnabled;

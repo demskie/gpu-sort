@@ -54,3 +54,7 @@ export function insertionSort(array: SortableTypedArrays) {
   }
   return array;
 }
+
+export function nativeSort(array: SortableTypedArrays) {
+  array.sort((a: any, b: any) => a - b);
+}

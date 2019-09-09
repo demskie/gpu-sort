@@ -1,29 +1,14 @@
 {
-    "parser": "@typescript-eslint/parser",
-    "extends": [
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 11,
-      "sourceType":"module",
-    },
-    "rules": {
-        "indent": [
-            "error",
-            "space"
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "double"
-        ],
-        "semi": [
-            "error",
-            "always"
-        ]
-    }
+  "parser": "@typescript-eslint/parser",
+  "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"]
+  }
 }
