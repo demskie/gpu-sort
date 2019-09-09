@@ -13,6 +13,15 @@ for (var width of [256, 512, 1024, 2048, 4096].values()) {
   cpuArray();
 }
 
+function isSorted(array: ArrayLike<number>) {
+  const limit = array.length - 1;
+  for (let i = 0; i < limit; i++) {
+    const current = array[i], next = array[i + 1];
+    if (current > next) { return false; }
+  }
+  return true;
+}
+
 function emptyBitonicSort(width: number) {
   let start = Date.now();
   const bytes = new gpu.RenderTarget(width);
@@ -43,7 +52,7 @@ function emptyBitonicSort(width: number) {
       u_endianness: shared.isLittleEndian ? 0 : 1
     });
   bytes.readSomePixels(0, 0, 0, 1);
-  console.log(`gpu.sortEmpty\t\t${Date.now() - start}ms`);
+	console.log(`gpu.sortEmpty\t\t${(Date.now() - start).toLocaleString("en")}ms`);
 }
 
 function sortUint32Array() {
@@ -52,7 +61,8 @@ function sortUint32Array() {
 
   let start = Date.now();
   index.sortUint32Array(gpuUint32Array);
-  console.log(`gpu.sortUint32Array\t${Date.now() - start}ms`);
+	console.log(`gpu.sortUint32Array\t${(Date.now() - start).toLocaleString("en")}ms`);
+	if (!isSorted(gpuUint32Array)) throw new Error("is not sorted")
 }
 
 function cpuFloat32Array() {
@@ -61,7 +71,8 @@ function cpuFloat32Array() {
 
   let start = Date.now();
   cpuFloat32Array.sort((a, b) => a - b);
-  console.log(`Float32Array.sort()\t${Date.now() - start}ms`);
+	console.log(`Float32Array.sort()\t${(Date.now() - start).toLocaleString("en")}ms`);
+	if (!isSorted(cpuFloat32Array)) throw new Error("is not sorted")
 }
 
 function cpuArray() {
@@ -69,5 +80,6 @@ function cpuArray() {
 
   let start = Date.now();
   cpuArray.sort((a, b) => a - b);
-  console.log(`Array.sort()\t\t${Date.now() - start}ms\n`);
+	console.log(`Array.sort()\t\t${(Date.now() - start).toLocaleString("en")}ms\n`);
+	if (!isSorted(cpuArray)) throw new Error("is not sorted")
 }
