@@ -4,3 +4,4 @@ node_modules
 /dist
 /bench
 /test
+*.bundle.js

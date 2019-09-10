@@ -2,6 +2,7 @@
 
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
+const babelPolyfill = require("babel-polyfill");
 
 const distConfig = {
   name: "dist",
@@ -89,6 +90,37 @@ const benchConfig = {
   }
 };
 
+const benchGenerateConfig = {
+  name: "bench-generate",
+  target: "web",
+  mode: "production",
+  entry: ["babel-polyfill", path.resolve(__dirname, "src/benchmarks/generate.bench.ts")],
+  output: {
+    path: path.resolve(__dirname, "serve-benchmark/public"),
+    filename: "generate.bundle.js",
+    library: "gpuSortGenerate",
+    libraryTarget: "window"
+  },
+  externals: [],
+  resolve: {
+    extensions: [".ts", ".js", ".json"]
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.(frag|vert|glsl)$/i,
+        exclude: /node_modules/,
+        loader: "raw-loader"
+      }
+    ]
+  }
+};
+
 const testConfig = {
   name: "test",
   target: "node",
@@ -118,4 +150,4 @@ const testConfig = {
   }
 };
 
-module.exports = [distConfig, libConfig, benchConfig, testConfig];
+module.exports = [distConfig, libConfig, benchConfig, benchGenerateConfig, testConfig];

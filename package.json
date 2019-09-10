@@ -6,6 +6,7 @@
   "scripts": {
     "bundle": "webpack --progress",
     "bench": "webpack --silent --progress --config-name bench && node bench/bench.bundle.js",
+    "bench-generate": "webpack --silent --progress --config-name bench-generate",
     "test": "webpack --silent --progress --config-name test && node test/test.bundle.js"
   },
   "repository": {
@@ -47,6 +48,7 @@
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "babel-loader": "^8.0.4",
+    "babel-polyfill": "^6.26.0",
     "benchmark": "^2.1.4",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.1.0",

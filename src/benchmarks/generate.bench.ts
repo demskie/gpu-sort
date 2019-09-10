@@ -5,12 +5,46 @@ import * as sort from "../shaders/bitonicsort/bitonicsort";
 
 index.precompile();
 
-for (var width of [256, 512, 1024, 2048, 4096].values()) {
-  console.log(`dimensions:\t\t${width} x ${width}`);
-  emptyBitonicSort(width);
-  sortUint32Array(width);
-  cpuFloat32Array(width);
-  cpuArray(width);
+export default function* generateBenchmarkText() {
+  let i = 0;
+  const widthArr = [256, 512, 1024, 2048, 4096];
+  const funcArr = [emptyBitonicSort, sortUint32Array, cpuFloat32Array, cpuArray];
+  const results = new Array(widthArr.length * 4).fill("pending");
+  for (var width of widthArr.values()) {
+    for (var fn of funcArr.values()) {
+      yield `
+dimensions:             256 x 256
+gpu.sortEmpty           ${results[0]}
+gpu.sortUint32Array     ${results[1]}
+Float32Array.sort()     ${results[2]}
+Array.sort()            ${results[3]}
+
+dimensions:             512 x 512
+gpu.sortEmpty           ${results[4]}
+gpu.sortUint32Array     ${results[5]}
+Float32Array.sort()     ${results[6]}
+Array.sort()            ${results[7]}
+
+dimensions:             1024 x 1024
+gpu.sortEmpty           ${results[8]}
+gpu.sortUint32Array     ${results[9]}
+Float32Array.sort()     ${results[10]}
+Array.sort()            ${results[11]}
+
+dimensions:             2048 x 2048
+gpu.sortEmpty           ${results[12]}
+gpu.sortUint32Array     ${results[13]}
+Float32Array.sort()     ${results[14]}
+Array.sort()            ${results[15]}
+
+dimensions:             4096 x 4096
+gpu.sortEmpty           ${results[16]}
+gpu.sortUint32Array     ${results[17]}
+Float32Array.sort()     ${results[18]}
+Array.sort()            ${results[19]}`.trim();
+      results[i++] = `${fn(width).toLocaleString("en")}ms`;
+    }
+  }
 }
 
 export function isSorted(array: ArrayLike<number>) {
@@ -19,6 +53,7 @@ export function isSorted(array: ArrayLike<number>) {
     const current = array[i],
       next = array[i + 1];
     if (current > next) {
+      throw new Error(`index:${i} (${current} > ${next})`);
       return false;
     }
   }
