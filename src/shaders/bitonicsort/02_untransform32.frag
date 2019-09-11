@@ -41,7 +41,7 @@ void main() {
 	vec4 flipped = floatEquals(u_mode, PASSTHROUGH) * texel.rgba;
 
 	// determine if we should flip the bits or not
-	float signBitIsSet = floatGreaterThanOrEqual(texel.a, 128.0);
+	float signBitIsSet = floatGreaterThanOrEqual(round(texel.a), 128.0);
 
 	// for integers just flip the sign bit
 	flipped.r += floatEquals(u_mode, INTEGER) * texel.r;
