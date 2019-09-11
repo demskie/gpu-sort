@@ -49,12 +49,12 @@ void main() {
 	vec2 descendingStartCoord = vec2(ascendingStartCoord.xy) + halfRegionOffset;
 
 	// get booleans for determining relative position and sorting order
-	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
-	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));		   
-	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
-					           floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
+	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
+	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
+						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
+	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
+					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
 
 	// get current data
 	vec2 localDataCoord = vec2(floor(gl_FragCoord.x) - mod(floor(gl_FragCoord.x), 4.0), gl_FragCoord.y);
@@ -105,54 +105,64 @@ void main() {
 					    + floatEquals(firstTexelBool, 0.0) * floatEquals(ascendingGroupBool, 1.0) * localDataFour.rgba
 					    + floatEquals(firstTexelBool, 0.0) * floatEquals(ascendingGroupBool, 0.0) * peerDataFour.rgba;
 
+	// denormalize data
+	alphaDataOne   *= 255.0;
+	alphaDataTwo   *= 255.0;
+	alphaDataThree *= 255.0;
+	alphaDataFour  *= 255.0;
+	bravoDataOne   *= 255.0;
+	bravoDataTwo   *= 255.0;
+	bravoDataThree *= 255.0;
+	bravoDataFour  *= 255.0;
+
 	// initializing booleans to false
 	float swapBool = 0.0;
 	float notSwapBool = 0.0;
 
 	// compare each byte in order to determine if swap is necessary
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataFour.a, bravoDataFour.a);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataFour.a, bravoDataFour.a);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataFour.b, bravoDataFour.b);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataFour.b, bravoDataFour.b);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataFour.g, bravoDataFour.g);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataFour.g, bravoDataFour.g);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataFour.r, bravoDataFour.r);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataFour.r, bravoDataFour.r);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataThree.a, bravoDataThree.a);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataThree.a, bravoDataThree.a);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataThree.b, bravoDataThree.b);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataThree.b, bravoDataThree.b);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataThree.g, bravoDataThree.g);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataThree.g, bravoDataThree.g);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataThree.r, bravoDataThree.r);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataThree.r, bravoDataThree.r);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataTwo.a, bravoDataTwo.a);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataTwo.a, bravoDataTwo.a);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataTwo.b, bravoDataTwo.b);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataTwo.b, bravoDataTwo.b);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataTwo.g, bravoDataTwo.g);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataTwo.g, bravoDataTwo.g);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataTwo.r, bravoDataTwo.r);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataTwo.r, bravoDataTwo.r);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataOne.a, bravoDataOne.a);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataOne.a, bravoDataOne.a);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataOne.b, bravoDataOne.b);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataOne.b, bravoDataOne.b);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataOne.g, bravoDataOne.g);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataOne.g, bravoDataOne.g);
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(alphaDataOne.r, bravoDataOne.r);
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(alphaDataOne.r, bravoDataOne.r);
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataFour.a), round(bravoDataFour.a));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataFour.a), round(bravoDataFour.a));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataFour.b), round(bravoDataFour.b));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataFour.b), round(bravoDataFour.b));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataFour.g), round(bravoDataFour.g));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataFour.g), round(bravoDataFour.g));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataFour.r), round(bravoDataFour.r));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataFour.r), round(bravoDataFour.r));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataThree.a), round(bravoDataThree.a));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataThree.a), round(bravoDataThree.a));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataThree.b), round(bravoDataThree.b));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataThree.b), round(bravoDataThree.b));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataThree.g), round(bravoDataThree.g));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataThree.g), round(bravoDataThree.g));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataThree.r), round(bravoDataThree.r));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataThree.r), round(bravoDataThree.r));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataTwo.a), round(bravoDataTwo.a));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataTwo.a), round(bravoDataTwo.a));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataTwo.b), round(bravoDataTwo.b));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataTwo.b), round(bravoDataTwo.b));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataTwo.g), round(bravoDataTwo.g));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataTwo.g), round(bravoDataTwo.g));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataTwo.r), round(bravoDataTwo.r));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataTwo.r), round(bravoDataTwo.r));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataOne.a), round(bravoDataOne.a));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataOne.a), round(bravoDataOne.a));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataOne.b), round(bravoDataOne.b));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataOne.b), round(bravoDataOne.b));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataOne.g), round(bravoDataOne.g));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataOne.g), round(bravoDataOne.g));
+	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaDataOne.r), round(bravoDataOne.r));
+	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaDataOne.r), round(bravoDataOne.r));
 
 	// handle edge case where bytes are identical and thus both booleans are false
 	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 0.0) * localDataOne.rgba
-				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 1.0) * localDataTwo.rgba
-				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 2.0) * localDataThree.rgba
-				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 3.0) * localDataFour.rgba
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 0.0) * peerDataOne.rgba
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 1.0) * peerDataTwo.rgba
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 2.0) * peerDataThree.rgba
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 3.0) * peerDataFour.rgba;
+	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 0.0) * localDataOne.rgba / 255.0
+				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 1.0) * localDataTwo.rgba / 255.0
+				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 2.0) * localDataThree.rgba / 255.0
+				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 3.0) * localDataFour.rgba / 255.0
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 0.0) * peerDataOne.rgba / 255.0
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 1.0) * peerDataTwo.rgba / 255.0
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 2.0) * peerDataThree.rgba / 255.0
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 4.0), 3.0) * peerDataFour.rgba  / 255.0;
 }

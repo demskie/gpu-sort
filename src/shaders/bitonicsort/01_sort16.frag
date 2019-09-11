@@ -39,12 +39,12 @@ void main() {
 	vec2 descendingStartCoord = vec2(ascendingStartCoord.xy) + halfRegionOffset;
 
 	// get booleans for determining relative position and sorting order
-	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
-	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));		   
-	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
-					           floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
+	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
+	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
+						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
+	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
+					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
 
 	// get current data
 	vec4 localData = texture2D(u_bytes, vec2(gl_FragCoord.xy) / u_width);
@@ -64,6 +64,10 @@ void main() {
 				   + floatEquals(firstTexelBool, 0.0) * floatEquals(ascendingGroupBool, 1.0) * localData.rgba
 				   + floatEquals(firstTexelBool, 0.0) * floatEquals(ascendingGroupBool, 0.0) * peerData.rgba;
 
+	// denormalize data
+	alphaData *= 255.0;
+	bravoData *= 255.0;
+
 	// initializing booleans to false
 	float swapBlueAlphaBool = 0.0;
 	float notSwapBlueAlphaBool = 0.0;
@@ -71,14 +75,14 @@ void main() {
 	float notSwapRedGreenBool = 0.0;
 
 	// compare each byte in order to determine if swap is necessary
-	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(alphaData.a, bravoData.a);
-	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(alphaData.a, bravoData.a);
-	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(alphaData.b, bravoData.b);
-	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(alphaData.b, bravoData.b);
-	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(alphaData.g, bravoData.g);
-	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(alphaData.g, bravoData.g);
-	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(alphaData.r, bravoData.r);
-	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(alphaData.r, bravoData.r);
+	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(round(alphaData.a), round(bravoData.a));
+	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(round(alphaData.a), round(bravoData.a));
+	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(round(alphaData.b), round(bravoData.b));
+	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(round(alphaData.b), round(bravoData.b));
+	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(round(alphaData.g), round(bravoData.g));
+	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(round(alphaData.g), round(bravoData.g));
+	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(round(alphaData.r), round(bravoData.r));
+	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(round(alphaData.r), round(bravoData.r));
 
 	// handle edge case where bytes are identical and thus both booleans are false
 	notSwapBlueAlphaBool += floatEquals(notSwapBlueAlphaBool, 0.0) * floatEquals(swapBlueAlphaBool, 0.0);
@@ -88,5 +92,5 @@ void main() {
 	gl_FragColor = vec4(floatEquals(notSwapRedGreenBool, 1.0) * localData.rg
 				 	  + floatEquals(notSwapRedGreenBool, 0.0) * peerData.rg,
 						floatEquals(notSwapBlueAlphaBool, 1.0) * localData.ba
-				 	  + floatEquals(notSwapBlueAlphaBool, 0.0) * peerData.ba);
+				 	  + floatEquals(notSwapBlueAlphaBool, 0.0) * peerData.ba) / 255.0;
 }
