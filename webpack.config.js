@@ -93,7 +93,7 @@ const benchGenerateConfig = {
   name: "bench-generate",
   target: "web",
   mode: "production",
-  entry: ["babel-polyfill", path.resolve(__dirname, "src/benchmarks/generate.bench.ts")],
+  entry: path.resolve(__dirname, "src/benchmarks/generate.bench.ts"),
   output: {
     path: path.resolve(__dirname, "serve-benchmark/public"),
     filename: "generate.bundle.js",

@@ -10,12 +10,11 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
+    "serve": "^11.1.0",
     "typescript": "3.6.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "start": "react-scripts build && npx serve -s build"
   },
   "eslintConfig": {
     "extends": "react-app"
