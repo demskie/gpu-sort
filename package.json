@@ -35,21 +35,43 @@
     "url": "https://github.com/demskie/gpu-sort/issues"
   },
   "typings": "lib/index.d.ts",
+  "browserslist": [
+    "Explorer 11",
+    "Edge 12",
+    "Firefox 24",
+    "Chrome 33",
+    "Safari 8",
+    "Opera 19",
+    "iOS 8",
+    "Android 67",
+    "Blackberry 10",
+    "ChromeAndroid 75",
+    "FirefoxAndroid 67",
+    "ExplorerMobile 11",
+    "UCAndroid 12.12",
+    "Samsung 4",
+    "QQAndroid 1.2",
+    "Baidu 7.12",
+    "kaios 2.5"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-numeric-separator": "^7.2.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
     "@babel/preset-typescript": "^7.6.0",
+    "@babel/runtime-corejs3": "^7.6.0",
     "@types/benchmark": "^1.0.31",
     "@types/node": "^12.7.2",
-    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.2.0",
     "@typescript-eslint/parser": "^2.0.0",
     "babel-loader": "^8.0.4",
     "babel-polyfill": "^6.26.0",
     "benchmark": "^2.1.4",
+    "core-js": "^3.2.1",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-import": "^2.18.2",
@@ -57,7 +79,6 @@
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "gpu-compute": "0.0.36",
     "prettier": "^1.18.2",
     "raw-loader": "^3.1.0",
     "ts-node": "^8.3.0",
@@ -66,5 +87,7 @@
     "webpack-cli": "^3.3.7",
     "webpack-node-externals": "^1.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "gpu-compute": "0.0.36"
+  }
 }

@@ -58,3 +58,10 @@ export function insertionSort(array: SortableTypedArrays) {
 export function nativeSort(array: SortableTypedArrays) {
   array.sort((a: any, b: any) => a - b);
 }
+
+export function shuffle(array: number[]|SortableTypedArrays) {
+	for (var len = array.length; len > 0; len--) {
+		let rnum = Math.floor(Math.random() * len);
+		[array[len-1], array[rnum]] = [array[rnum], array[len-1]];
+	}
+}

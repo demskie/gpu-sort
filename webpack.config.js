@@ -100,7 +100,10 @@ const benchGenerateConfig = {
     filename: "generate.bundle.js",
     library: "gpuSortGenerate",
     libraryTarget: "window"
-  },
+	},
+	node: {
+		fs: "empty"
+	},
   externals: [],
   resolve: {
     extensions: [".ts", ".js", ".json"]
