@@ -13,8 +13,8 @@ export default class App extends React.Component<{}, AppState> {
 
   updateOutputString = () => {
     const result = generator.next();
-    const callback = () => setTimeout(() => this.updateOutputString(), 500);
-    if (!result.done) this.setState({ output: result.value }, callback);
+    if (result.value) this.setState({ output: result.value });
+    if (!result.done) setTimeout(() => this.updateOutputString(), 750);
   };
 
   render() {

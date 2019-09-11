@@ -3,9 +3,10 @@
     [
       "@babel/preset-env",
       {
+        "debug": true,
         "spec": false,
         "loose": false,
-        "useBuiltIns": "entry", // or usage
+        "useBuiltIns": "usage",
         "corejs": 3,
         "forceAllTransforms": false
       }

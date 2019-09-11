@@ -2,7 +2,6 @@
 
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
-const babelPolyfill = require("babel-polyfill");
 
 const distConfig = {
   name: "dist",
@@ -100,10 +99,10 @@ const benchGenerateConfig = {
     filename: "generate.bundle.js",
     library: "gpuSortGenerate",
     libraryTarget: "window"
-	},
-	node: {
-		fs: "empty"
-	},
+  },
+  node: {
+    fs: "empty"
+  },
   externals: [],
   resolve: {
     extensions: [".ts", ".js", ".json"]
@@ -113,7 +112,10 @@ const benchGenerateConfig = {
       {
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
-        loader: "babel-loader"
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true
+        }
       },
       {
         test: /\.(frag|vert|glsl)$/i,
