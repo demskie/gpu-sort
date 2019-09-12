@@ -111,12 +111,12 @@ function emptyBitonicSort(width: number) {
 function sortUint32Array(width: number) {
   return new Promise(resolve => {
     let elapsed = 0;
-    let slice = new Uint32Array(width * width * 4);
+    let slice = new Uint32Array(width * width);
     randomizeBytes(new Uint8Array(slice.buffer))
       .then(() => sleep(500))
       .then(() => {
         let start = performance.now();
-        index.sortUint32Array(new Uint32Array(slice.buffer));
+        index.sortUint32Array(slice);
         elapsed = performance.now() - start;
       })
       .then(() => sleep(500))
@@ -128,7 +128,7 @@ function sortUint32Array(width: number) {
 function cpuFloat32Array(width: number) {
   return new Promise(resolve => {
     let elapsed = 0;
-    let slice = new Float32Array(width * width * 4);
+    let slice = new Float32Array(width * width);
     randomizeBytes(new Uint8Array(slice.buffer))
       .then(() => sleep(500))
       .then(() => {
