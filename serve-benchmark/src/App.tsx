@@ -1,6 +1,6 @@
 import React from "react";
 
-const generator = (window as any).gpuSortGenerate.default() as IterableIterator<string>;
+const generator = (window as any).gpuSortGenerate.default() as IterableIterator<Promise<unknown>>;
 
 interface AppState {
   output: string;
@@ -8,13 +8,24 @@ interface AppState {
 
 export default class App extends React.Component<{}, AppState> {
   state = {
-    output: generator.next().value
+    output: ""
   } as AppState;
+
+  componentDidMount = () => {
+    generator.next().value.then((output: string) => {
+      this.setState({ output });
+    });
+  };
 
   updateOutputString = () => {
     const result = generator.next();
-    if (result.value) this.setState({ output: result.value });
-    if (!result.done) setTimeout(() => this.updateOutputString(), 750);
+    if (result.value) {
+      result.value.then((output: string) => {
+        this.setState({ output }, () => {
+          if (!result.done) setTimeout(() => this.updateOutputString(), 500);
+        });
+      });
+    }
   };
 
   render() {

@@ -7,6 +7,8 @@ index.precompile();
 
 const cache = new Uint8Array(4096 * 4096 * 4);
 
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
 export default function* generateBenchmarkText() {
   let i = 0;
   const widthArr = [256, 512, 1024, 2048, 4096];
@@ -39,87 +41,105 @@ gpu.sortEmpty           ${results[12]}
 gpu.sortUint32Array     ${results[13]}
 Float32Array.sort()     ${results[14]}
 		`.trim();
-  yield getString();
+  yield new Promise(r => r(getString()));
   for (var width of widthArr.values()) {
     for (var fn of funcArr.values()) {
-      results[i++] = `${fn(width).toLocaleString("en")}ms`;
-      yield getString();
+      yield new Promise(resolve => {
+        fn(width).then((result: number) => {
+          results[i++] = `${result.toLocaleString("en")}ms`;
+          resolve(getString());
+        });
+      });
     }
   }
 }
 
-export function isSorted(array: ArrayLike<number>) {
-  const limit = array.length - 1;
-  for (let i = 0; i < limit; i++) {
-    const current = array[i],
-      next = array[i + 1];
-    if (current > next) {
-      throw new Error(`index:${i} (${current} > ${next})`);
-      return false;
+function checkSorting(array: ArrayLike<number>) {
+  return new Promise(resolve => {
+    for (let i = 0; i < array.length - 1; i++) {
+      if (array[i] > array[i + 1]) {
+        throw new Error(`index:${i} (${array[i]} > ${array[i + 1]})`);
+      }
     }
-  }
-  return true;
+    resolve();
+  });
 }
 
 function randomizeBytes(bytes: Uint8Array) {
-  for (var i = 0; i < bytes.length; i++) {
-    bytes[i] = Math.floor(Math.random() * 256);
-  }
+  return new Promise(resolve => {
+    for (var i = 0; i < bytes.length; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
+    resolve();
+  });
 }
 
-export function emptyBitonicSort(width: number) {
-  let start = performance.now();
-  let bytes = new gpu.RenderTarget(width);
-  let params = sort.getParameters("Uint32Array");
-  if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
-    bytes.compute(params.transformShader, {
-      u_bytes: bytes,
-      u_width: bytes.width,
-      u_mode: params.mode,
-      u_endianness: shared.isLittleEndian ? 0 : 1
-    });
-  let uniforms = sort.calculateBitonicUniforms(bytes.width);
-  for (var i = 0; i < uniforms.length; i++) {
-    bytes.compute(params.sortShader, {
-      u_bytes: bytes,
-      u_width: bytes.width,
-      u_blockSizeX: uniforms[i].blockSizeX,
-      u_blockSizeY: uniforms[i].blockSizeY,
-      u_regionSizeX: uniforms[i].regionSizeX,
-      u_regionSizeY: uniforms[i].regionSizeY
-    });
-  }
-  if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
-    bytes.compute(params.untransformShader, {
-      u_bytes: bytes,
-      u_width: bytes.width,
-      u_mode: params.mode,
-      u_endianness: shared.isLittleEndian ? 0 : 1
-    });
-  bytes.readSomePixels(0, 0, 1, 0);
-  let elapsed = performance.now() - start;
-  console.log(`gpu.sortEmpty\t\t${elapsed.toLocaleString("en")}ms`);
-  return elapsed;
+function emptyBitonicSort(width: number) {
+  return new Promise(resolve => {
+    let start = performance.now();
+    let bytes = new gpu.RenderTarget(width);
+    let params = sort.getParameters("Uint32Array");
+    if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
+      bytes.compute(params.transformShader, {
+        u_bytes: bytes,
+        u_width: bytes.width,
+        u_mode: params.mode,
+        u_endianness: shared.isLittleEndian ? 0 : 1
+      });
+    let uniforms = sort.calculateBitonicUniforms(bytes.width);
+    for (var i = 0; i < uniforms.length; i++) {
+      bytes.compute(params.sortShader, {
+        u_bytes: bytes,
+        u_width: bytes.width,
+        u_blockSizeX: uniforms[i].blockSizeX,
+        u_blockSizeY: uniforms[i].blockSizeY,
+        u_regionSizeX: uniforms[i].regionSizeX,
+        u_regionSizeY: uniforms[i].regionSizeY
+      });
+    }
+    if (!shared.isLittleEndian || params.mode !== sort.TRANSFORM_MODE.PASSTHROUGH)
+      bytes.compute(params.untransformShader, {
+        u_bytes: bytes,
+        u_width: bytes.width,
+        u_mode: params.mode,
+        u_endianness: shared.isLittleEndian ? 0 : 1
+      });
+    bytes.readSomePixels(0, 0, 1, 0);
+    let elapsed = performance.now() - start;
+    resolve(elapsed);
+  });
 }
 
-export function sortUint32Array(width: number) {
-  let slice = new Uint32Array(cache.subarray(0, width * width * 4).buffer);
-  let start = performance.now();
-  index.sortUint32Array(new Uint32Array(slice.buffer));
-  let elapsed = performance.now() - start;
-  console.log(`gpu.sortUint32Array\t${elapsed.toLocaleString("en")}ms`);
-  if (!isSorted(new Uint32Array(slice.buffer))) throw new Error("is not sorted");
-  randomizeBytes(cache.subarray(0, width * width * 4));
-  return elapsed;
+function sortUint32Array(width: number) {
+  return new Promise(resolve => {
+    let elapsed = 0;
+    let slice = new Uint32Array(cache.subarray(0, width * width * 4).buffer);
+    randomizeBytes(new Uint8Array(slice.buffer))
+      .then(() => sleep(500))
+      .then(() => {
+        let start = performance.now();
+        index.sortUint32Array(new Uint32Array(slice.buffer));
+        elapsed = performance.now() - start;
+      })
+      .then(() => sleep(500))
+      .then(() => checkSorting(slice))
+      .then(() => resolve(elapsed));
+  });
 }
 
-export function cpuFloat32Array(width: number) {
-  let slice = new Float32Array(cache.subarray(0, width * width * 4).buffer);
-  let start = performance.now();
-  slice.sort((a, b) => a - b);
-  let elapsed = performance.now() - start;
-  console.log(`Float32Array.sort()\t${elapsed.toLocaleString("en")}ms`);
-  if (!isSorted(slice)) throw new Error("is not sorted");
-  randomizeBytes(cache.subarray(0, width * width * 4));
-  return elapsed;
+function cpuFloat32Array(width: number) {
+  return new Promise(resolve => {
+    let elapsed = 0;
+    let slice = new Float32Array(cache.subarray(0, width * width * 4).buffer);
+    randomizeBytes(new Uint8Array(slice.buffer))
+      .then(() => sleep(500))
+      .then(() => {
+        let start = performance.now();
+        slice.sort((a, b) => a - b);
+        elapsed = performance.now() - start;
+      })
+      .then(() => sleep(500))
+      .then(() => checkSorting(slice))
+      .then(() => resolve(elapsed));
+  });
 }
