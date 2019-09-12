@@ -14,7 +14,8 @@
     "typescript": "3.6.2"
   },
   "scripts": {
-    "start": "react-scripts build && npx serve -s build"
+    "debug": "react-scripts start",
+    "bench": "react-scripts build && npx serve -s build"
   },
   "eslintConfig": {
     "extends": "react-app"

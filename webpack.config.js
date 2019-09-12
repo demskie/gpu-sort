@@ -69,7 +69,7 @@ const benchConfig = {
     path: path.resolve(__dirname, "bench"),
     filename: "bench.bundle.js"
   },
-  externals: [nodeExternals()],
+  externals: [],
   resolve: {
     extensions: [".ts", ".js", ".json"]
   },
@@ -135,21 +135,21 @@ const testConfig = {
     path: path.resolve(__dirname, "test"),
     filename: "test.bundle.js"
   },
-  externals: [nodeExternals()],
+  externals: [],
   resolve: {
     extensions: [".ts", ".js", ".json"]
   },
   module: {
     rules: [
       {
-        test: /\.(frag|vert|glsl)$/i,
-        exclude: /node_modules/,
-        loader: "raw-loader"
-      },
-      {
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: "babel-loader"
+      },
+      {
+        test: /\.(frag|vert|glsl)$/i,
+        exclude: /node_modules/,
+        loader: "raw-loader"
       }
     ]
   }
