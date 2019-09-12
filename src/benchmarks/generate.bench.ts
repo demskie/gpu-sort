@@ -5,8 +5,6 @@ import * as sort from "../shaders/bitonicsort/bitonicsort";
 
 index.precompile();
 
-const cache = new Uint8Array(4096 * 4096 * 4);
-
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 export default function* generateBenchmarkText() {
@@ -113,7 +111,7 @@ function emptyBitonicSort(width: number) {
 function sortUint32Array(width: number) {
   return new Promise(resolve => {
     let elapsed = 0;
-    let slice = new Uint32Array(cache.subarray(0, width * width * 4).buffer);
+    let slice = new Uint32Array(width * width * 4);
     randomizeBytes(new Uint8Array(slice.buffer))
       .then(() => sleep(500))
       .then(() => {
@@ -130,7 +128,7 @@ function sortUint32Array(width: number) {
 function cpuFloat32Array(width: number) {
   return new Promise(resolve => {
     let elapsed = 0;
-    let slice = new Float32Array(cache.subarray(0, width * width * 4).buffer);
+    let slice = new Float32Array(width * width * 4);
     randomizeBytes(new Uint8Array(slice.buffer))
       .then(() => sleep(500))
       .then(() => {
