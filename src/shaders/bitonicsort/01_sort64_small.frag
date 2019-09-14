@@ -49,7 +49,7 @@ void main() {
 	// get booleans for determining relative position and sorting order
 	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
 	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
+						            floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
 	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
 	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
 					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
