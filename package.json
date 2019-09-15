@@ -8,8 +8,7 @@
     "bundle-browser": "webpack --silent --progress --config-name dist",
     "bench": "npm run bench-node",
     "bench-node": "webpack --silent --progress --config-name bench && node bench/bench.bundle.js",
-    "prebench-browser": "webpack --silent --progress --config-name bench-generate && npm --prefix serve-benchmark install serve-benchmark",
-    "bench-browser": "npm run prebench-browser && npm run debug --prefix serve-benchmark",
+    "bench-browser": "webpack --silent --progress --config-name bench-generate && npm run debug --prefix serve-benchmark",
     "test": "npm run test-node",
     "test-node": "webpack --silent --progress --config-name test && node test/test.bundle.js"
   },
