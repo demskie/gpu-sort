@@ -10,7 +10,7 @@ function bitonicSort(array: shared.SortableTypedArrays, constructorName: string,
   const width = targets[targets.length - 1].width;
   const targetByteLength = width * width * 4;
   let start = 0;
-  let overflowing = bytes.length !== targetByteLength;
+  let overflowing = bytes.length % targetByteLength !== 0;
   for (let target of targets) {
     if (target.width === 1) continue;
     if (!overflowing) {
