@@ -4,7 +4,7 @@ precision mediump int;
 precision mediump sampler2D;
 #endif
 
-uniform sampler2D u_bytes;
+uniform sampler2D u_firstBytes;
 uniform float u_width;
 uniform float u_blockSizeX;
 uniform float u_blockSizeY;
@@ -49,21 +49,21 @@ void main() {
 	// get booleans for determining relative position and sorting order
 	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
 	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
-						            floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
+						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
 	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
 	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
 					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
 
 	// get current data
 	vec2 localDataCoord = vec2(floor(gl_FragCoord.x) - mod(floor(gl_FragCoord.x), 2.0), gl_FragCoord.y);
-	vec4 localDataOne = texture2D(u_bytes, vec2(localDataCoord.xy + vec2(0.5, 0.0)) / u_width);
-	vec4 localDataTwo = texture2D(u_bytes, vec2(localDataCoord.xy + vec2(1.5, 0.0)) / u_width);
+	vec4 localDataOne = texture2D(u_firstBytes, vec2(localDataCoord.xy + vec2(0.5, 0.0)) / u_width);
+	vec4 localDataTwo = texture2D(u_firstBytes, vec2(localDataCoord.xy + vec2(1.5, 0.0)) / u_width);
 
 	// get peer data
 	vec2 peerFragCoord = floatEquals(firstTexelBool, 1.0) * (localDataCoord.xy + halfBlockOffset)
 					   + floatEquals(firstTexelBool, 0.0) * (localDataCoord.xy - halfBlockOffset);
-	vec4 peerDataOne = texture2D(u_bytes, vec2(peerFragCoord.xy + vec2(0.5, 0.0)) / u_width);
-	vec4 peerDataTwo = texture2D(u_bytes, vec2(peerFragCoord.xy + vec2(1.5, 0.0)) / u_width);
+	vec4 peerDataOne = texture2D(u_firstBytes, vec2(peerFragCoord.xy + vec2(0.5, 0.0)) / u_width);
+	vec4 peerDataTwo = texture2D(u_firstBytes, vec2(peerFragCoord.xy + vec2(1.5, 0.0)) / u_width);
 	
 	// create alpha and bravo texels where alpha is expected to be less than bravo
 	vec4 alphaDataOne = floatEquals(firstTexelBool, 1.0) * floatEquals(ascendingGroupBool, 1.0) * localDataOne.rgba

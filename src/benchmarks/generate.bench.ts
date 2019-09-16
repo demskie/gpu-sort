@@ -1,9 +1,6 @@
-import * as gpu from "gpu-compute";
 import * as index from "../index";
-import * as shared from "../shared";
-import * as sort from "../shaders/bitonicsort/bitonicsort";
 
-index.precompile();
+index.precompileAll();
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 

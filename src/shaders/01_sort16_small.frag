@@ -4,7 +4,7 @@ precision mediump int;
 precision mediump sampler2D;
 #endif
 
-uniform sampler2D u_bytes;
+uniform sampler2D u_firstBytes;
 uniform float u_width;
 uniform float u_blockSizeX;
 uniform float u_blockSizeY;
@@ -47,12 +47,12 @@ void main() {
 					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
 
 	// get current data
-	vec4 localData = texture2D(u_bytes, vec2(gl_FragCoord.xy) / u_width);
+	vec4 localData = texture2D(u_firstBytes, vec2(gl_FragCoord.xy) / u_width);
 
 	// get peer data
 	vec2 peerFragCoord = floatEquals(firstTexelBool, 1.0) * (gl_FragCoord.xy + halfBlockOffset)
 					   + floatEquals(firstTexelBool, 0.0) * (gl_FragCoord.xy - halfBlockOffset);
-	vec4 peerData = texture2D(u_bytes, vec2(peerFragCoord.xy) / u_width);
+	vec4 peerData = texture2D(u_firstBytes, vec2(peerFragCoord.xy) / u_width);
 
 	// create alpha and bravo texels where alpha is expected to be less than bravo
 	vec4 alphaData = floatEquals(firstTexelBool, 1.0) * floatEquals(ascendingGroupBool, 1.0) * localData.rgba
@@ -69,23 +69,28 @@ void main() {
 	bravoData *= 255.0;
 
 	// initializing booleans to false
-	float swapBool = 0.0;
-	float notSwapBool = 0.0;
+	float swapBlueAlphaBool = 0.0;
+	float notSwapBlueAlphaBool = 0.0;
+	float swapRedGreenBool = 0.0;
+	float notSwapRedGreenBool = 0.0;
 
 	// compare each byte in order to determine if swap is necessary
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaData.a), round(bravoData.a));
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaData.a), round(bravoData.a));
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaData.b), round(bravoData.b));
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaData.b), round(bravoData.b));
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaData.g), round(bravoData.g));
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaData.g), round(bravoData.g));
-	swapBool    += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatGreaterThan(round(alphaData.r), round(bravoData.r));
-	notSwapBool += floatEquals(swapBool, 0.0) * floatEquals(notSwapBool, 0.0) * floatLessThan(round(alphaData.r), round(bravoData.r));
+	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(round(alphaData.a), round(bravoData.a));
+	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(round(alphaData.a), round(bravoData.a));
+	swapBlueAlphaBool    += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatGreaterThan(round(alphaData.b), round(bravoData.b));
+	notSwapBlueAlphaBool += floatEquals(swapBlueAlphaBool, 0.0) * floatEquals(notSwapBlueAlphaBool, 0.0) * floatLessThan(round(alphaData.b), round(bravoData.b));
+	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(round(alphaData.g), round(bravoData.g));
+	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(round(alphaData.g), round(bravoData.g));
+	swapRedGreenBool    += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatGreaterThan(round(alphaData.r), round(bravoData.r));
+	notSwapRedGreenBool += floatEquals(swapRedGreenBool, 0.0) * floatEquals(notSwapRedGreenBool, 0.0) * floatLessThan(round(alphaData.r), round(bravoData.r));
 
 	// handle edge case where bytes are identical and thus both booleans are false
-	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
+	notSwapBlueAlphaBool += floatEquals(notSwapBlueAlphaBool, 0.0) * floatEquals(swapBlueAlphaBool, 0.0);
+	notSwapRedGreenBool  += floatEquals(notSwapRedGreenBool, 0.0) * floatEquals(swapRedGreenBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * localData.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * peerData.rgba / 255.0;
+	gl_FragColor = vec4(floatEquals(notSwapRedGreenBool, 1.0) * localData.rg
+				 	  + floatEquals(notSwapRedGreenBool, 0.0) * peerData.rg,
+						floatEquals(notSwapBlueAlphaBool, 1.0) * localData.ba
+				 	  + floatEquals(notSwapBlueAlphaBool, 0.0) * peerData.ba) / 255.0;
 }
