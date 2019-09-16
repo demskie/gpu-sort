@@ -19,7 +19,6 @@ export function createTargets(bytes: Uint8Array) {
     }
     break;
   }
-  console.log(`renderTarget.length: ${targets.length}`);
   return targets;
 }
 
