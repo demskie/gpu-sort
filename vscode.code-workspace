@@ -1,20 +1,34 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"editor.detectIndentation": false,
-		"editor.tabSize": 2,
-		"editor.insertSpaces": true,
-		"jest.runAllTestsFirst": true,
-		"jest.debugMode": true,
-		"jest.pathToConfig": "package.json",
-		"coverage-gutters.showGutterCoverage": false,
-		"coverage-gutters.showLineCoverage": true,
-		"coverage-gutters.showRulerCoverage": false,
-		"coverage-gutters.coverageFileNames": ["coverage/lcov.info"],
-		"coverage-gutters.highlightdark": "rgba(45, 121, 10, 0.2)"
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "prettier.printWidth": 119,
+    "prettier.useTabs": true,
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "[javascript]": { "editor.tabSize": 2 },
+    "[typescript]": { "editor.tabSize": 2 },
+    "[typescriptreact]": { "editor.tabSize": 2 },
+    "[json]": { "editor.tabSize": 2 },
+    "[jsonc]": { "editor.tabSize": 2 },
+    "[html]": { "editor.tabSize": 2 },
+    "[css]": { "editor.tabSize": 2 },
+    "[frag]": { "editor.tabSize": 4 },
+    "[vert]": { "editor.tabSize": 4 },
+    "[go]": { "editor.tabSize": 4 },
+    "files.eol": "\n",
+    "jest.runAllTestsFirst": true,
+    "jest.debugMode": true,
+    "jest.pathToConfig": "package.json",
+    "coverage-gutters.showGutterCoverage": false,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": false,
+    "coverage-gutters.coverageFileNames": ["coverage/lcov.info"],
+    "coverage-gutters.highlightdark": "rgba(45, 121, 10, 0.2)"
+  }
 }

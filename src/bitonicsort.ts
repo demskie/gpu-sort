@@ -1,6 +1,7 @@
 import * as gpu from "gpu-compute";
 import * as init from "./initialize";
 import * as shared from "./shared";
+import { Uniforms } from "gpu-compute/lib/renderTarget";
 
 export function bitonicSort(byteSlices: gpu.RenderTarget[], constructorName: string) {
   if (!byteSlices || byteSlices.length === 0 || byteSlices.length > 8)
@@ -46,7 +47,7 @@ export function bitonicSort(byteSlices: gpu.RenderTarget[], constructorName: str
         u_blockSizeY: uniforms[i].blockSizeY,
         u_regionSizeX: uniforms[i].regionSizeX,
         u_regionSizeY: uniforms[i].regionSizeY
-      });
+      } as Uniforms);
     }
   }
   if (!shared.isLittleEndian || params.mode !== TRANSFORM_MODE.PASSTHROUGH) {
@@ -77,7 +78,7 @@ export interface bitonicParameters {
 
 export function getParameters(byteSlices: gpu.RenderTarget[], constructorName: string) {
   let mode: TRANSFORM_MODE;
-  let sortShaders: gpu.ComputeShader[];
+  let sortShaders = [] as gpu.ComputeShader[];
   let transformShader: gpu.ComputeShader;
   let untransformShader: gpu.ComputeShader;
   switch (constructorName) {

@@ -1,27 +1,11 @@
 {
-  "presets": [
-    [
-      "@babel/preset-env",
-      {
-        "debug": true,
-        "spec": false,
-        "loose": false,
-        "useBuiltIns": "usage",
-        "corejs": 3,
-        "forceAllTransforms": false
-      }
-    ],
-    "@babel/typescript"
-  ],
+  "presets": ["@babel/typescript"],
   "plugins": [
     [
-      "@babel/plugin-transform-runtime",
+      "babel-plugin-static-fs",
       {
-        "absoluteRuntime": false,
-        "corejs": 3,
-        "helpers": true,
-        "regenerator": true,
-        "useESModules": false
+        "target": "browser",
+        "dynamic": false
       }
     ],
     "@babel/proposal-class-properties",

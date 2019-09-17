@@ -1,5 +1,6 @@
 import * as gpu from "gpu-compute";
 import * as shared from "./shared";
+import { readFileSync } from "fs";
 
 const byteStrings = [
   "texture2D(u_firstBytes",
@@ -12,11 +13,11 @@ const byteStrings = [
   "texture2D(u_eighthBytes"
 ];
 
-import transform64 from "./shaders/00_transform64.frag";
-import sort64Small from "./shaders/01_sort64_small.frag";
-import sort64Medium from "./shaders/01_sort64_medium.frag";
-import sort64Large from "./shaders/01_sort64_large.frag";
-import untransform64 from "./shaders/02_untransform64.frag";
+const transform64 = readFileSync(require.resolve("./shaders/00_transform64.frag"), "utf8");
+const sort64Small = readFileSync(require.resolve("./shaders/01_sort64_small.frag"), "utf8");
+const sort64Medium = readFileSync(require.resolve("./shaders/01_sort64_medium.frag"), "utf8");
+const sort64Large = readFileSync(require.resolve("./shaders/01_sort64_large.frag"), "utf8");
+const untransform64 = readFileSync(require.resolve("./shaders/02_untransform64.frag"), "utf8");
 
 var transform64Shader: gpu.ComputeShader | undefined;
 var sort64SmallShader: gpu.ComputeShader | undefined;
@@ -24,11 +25,11 @@ var sort64MediumShaders: gpu.ComputeShader[] | undefined;
 var sort64LargeShaders: gpu.ComputeShader[] | undefined;
 var untransform64Shader: gpu.ComputeShader | undefined;
 
-import transform32 from "./shaders/00_transform32.frag";
-import sort32Small from "./shaders/01_sort32_small.frag";
-import sort32Medium from "./shaders/01_sort32_medium.frag";
-import sort32Large from "./shaders/01_sort32_large.frag";
-import untransform32 from "./shaders/02_untransform32.frag";
+const transform32 = readFileSync(require.resolve("./shaders/00_transform32.frag"), "utf8");
+const sort32Small = readFileSync(require.resolve("./shaders/01_sort32_small.frag"), "utf8");
+const sort32Medium = readFileSync(require.resolve("./shaders/01_sort32_medium.frag"), "utf8");
+const sort32Large = readFileSync(require.resolve("./shaders/01_sort32_large.frag"), "utf8");
+const untransform32 = readFileSync(require.resolve("./shaders/02_untransform32.frag"), "utf8");
 
 var transform32Shader: gpu.ComputeShader | undefined;
 var sort32SmallShader: gpu.ComputeShader | undefined;
@@ -36,11 +37,11 @@ var sort32MediumShaders: gpu.ComputeShader[] | undefined;
 var sort32LargeShaders: gpu.ComputeShader[] | undefined;
 var untransform32Shader: gpu.ComputeShader | undefined;
 
-import transform16 from "./shaders/00_transform16.frag";
-import sort16Small from "./shaders/01_sort16_small.frag";
-import sort16Medium from "./shaders/01_sort16_medium.frag";
-import sort16Large from "./shaders/01_sort16_large.frag";
-import untransform16 from "./shaders/02_untransform16.frag";
+const transform16 = readFileSync(require.resolve("./shaders/00_transform16.frag"), "utf8");
+const sort16Small = readFileSync(require.resolve("./shaders/01_sort16_small.frag"), "utf8");
+const sort16Medium = readFileSync(require.resolve("./shaders/01_sort16_medium.frag"), "utf8");
+const sort16Large = readFileSync(require.resolve("./shaders/01_sort16_large.frag"), "utf8");
+const untransform16 = readFileSync(require.resolve("./shaders/02_untransform16.frag"), "utf8");
 
 var transform16Shader: gpu.ComputeShader | undefined;
 var sort16SmallShader: gpu.ComputeShader | undefined;

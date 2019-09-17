@@ -4,14 +4,12 @@
   "description": "gpu accelerated stable sort",
   "main": "lib/index.js",
   "scripts": {
-    "bundle-node": "webpack --silent --progress --config-name lib",
-    "bundle-browser": "webpack --silent --progress --config-name dist",
-    "bench": "npm run bench-node",
-    "bench-node": "webpack --silent --progress --config-name bench && node bench/bench.bundle.js",
-    "prebench-browser": "webpack --silent --progress --config-name bench-generate",
-    "bench-browser": "npm run prebench-browser && npm run debug --prefix serve-benchmark",
-    "test": "npm run test-node",
-    "test-node": "webpack --silent --progress --config-name test && node test/test.bundle.js"
+    "prebuild": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/",
+    "build": "tsc",
+    "inline-shaders": "babel --no-babelrc --config-file ./.babelrc-only-static-fs lib/initialize.js --out-file lib/initialize.js",
+    "bundle": "webpack --progress --config-name dist",
+    "prebench-browser": "webpack --progress --config-name bench-generate",
+    "bench-browser": "npm run prebench-browser && npm run debug --prefix serve-benchmark"
   },
   "repository": {
     "type": "git",
@@ -30,7 +28,9 @@
     "compute",
     "webgl",
     "glsl",
-    "shader"
+    "shader",
+    "async",
+    "promises"
   ],
   "author": "Alex Demskie",
   "license": "MIT",
@@ -40,15 +40,6 @@
   },
   "typings": "lib/index.d.ts",
   "browserslist": [
-    "android 67",
-    "chrome 33",
-    "edge 12",
-    "firefox 24",
-    "ie 11",
-    "ios 8",
-    "opera 19",
-    "safari 8",
-    "samsung 4",
     "node 6.5"
   ],
   "devDependencies": {
@@ -62,27 +53,29 @@
     "@babel/runtime-corejs3": "^7.6.0",
     "@types/benchmark": "^1.0.31",
     "@types/node": "^12.7.2",
-    "@typescript-eslint/eslint-plugin": "^2.2.0",
-    "@typescript-eslint/parser": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
     "babel-loader": "^8.0.4",
+    "babel-plugin-static-fs": "^3.0.0",
+    "babel-runtime": "^6.26.0",
     "benchmark": "^2.1.4",
     "core-js": "^3.2.1",
-    "eslint": "^6.2.2",
-    "eslint-config-prettier": "^6.1.0",
+    "cpy-cli": "^2.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "gpu-compute": "0.0.39",
+    "make-dir-cli": "^2.0.0",
     "prettier": "^1.18.2",
-    "raw-loader": "^3.1.0",
-    "ts-loader": "^6.1.0",
+    "trash-cli": "^3.0.0",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-cli": "^3.3.7"
   },
-  "dependencies": {
-    "gpu-compute": "0.0.38"
-  }
+  "dependencies": {}
 }
