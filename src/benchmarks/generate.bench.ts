@@ -1,6 +1,6 @@
 import * as index from "../index";
 
-index.precompileAll();
+// index.precompileAll();
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
