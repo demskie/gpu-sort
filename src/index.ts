@@ -2,6 +2,8 @@ import * as shared from "./shared";
 import * as init from "./initialize";
 import * as sort from "./bitonicsort";
 
+export { setWebGLContext } from "gpu-compute";
+
 function bitonicSort(array: shared.SortableTypedArrays, constructorName: string, forceCPU?: boolean) {
   if (forceCPU || !gpuProcessingEnabled || array.length < 256 * 256) return shared.nativeSort(array);
   const bytes = new Uint8Array(array.buffer);

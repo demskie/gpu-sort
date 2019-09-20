@@ -3,6 +3,7 @@ import * as index from "../index";
 import * as shared from "../shared";
 import * as sort from "../shaders/bitonicsort/bitonicsort";
 
+// index.setWebGLContext(require("gl")(1, 1) as WebGLRenderingContext);
 index.precompile();
 
 for (var width of [256, 512, 1024, 2048, 4096].values()) {
