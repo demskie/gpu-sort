@@ -1,6 +1,8 @@
 import * as shared from "../shared";
 import * as index from "../index";
 
+index.setWebGLContext(require("gl")(1, 1));
+
 var input;
 
 input = new Float32Array(Array.from(Array(256 * 256), () => Math.random() * 0xffffffff));

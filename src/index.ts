@@ -5,7 +5,8 @@ import * as sort from "./bitonicsort";
 export { setWebGLContext } from "gpu-compute";
 
 function bitonicSort(array: shared.SortableTypedArrays, constructorName: string, forceCPU?: boolean) {
-  if (forceCPU || !gpuProcessingEnabled || array.length < 256 * 256) return shared.nativeSort(array);
+  const minBytes = 256 * 256 * array.BYTES_PER_ELEMENT;
+  if (forceCPU || !gpuProcessingEnabled || array.buffer.byteLength < minBytes) return shared.nativeSort(array);
   const bytes = new Uint8Array(array.buffer);
   const targets = shared.createTargets(bytes);
   sort.bitonicSort(targets, constructorName);

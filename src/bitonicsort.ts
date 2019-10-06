@@ -49,6 +49,7 @@ export function bitonicSort(byteSlices: gpu.RenderTarget[], constructorName: str
         u_regionSizeY: uniforms[i].regionSizeY
       } as Uniforms);
     }
+    gpu.getWebGLContext().flush();
   }
   if (!shared.isLittleEndian || params.mode !== TRANSFORM_MODE.PASSTHROUGH) {
     for (let bytes of byteSlices) {

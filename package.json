@@ -4,12 +4,13 @@
   "description": "gpu accelerated stable sort",
   "main": "lib/index.js",
   "scripts": {
+    "test": "ts-node src/tests/index.test.ts",
     "prebuild": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/",
     "build": "tsc",
     "inline-shaders": "babel --no-babelrc --config-file ./.babelrc-only-static-fs lib/initialize.js --out-file lib/initialize.js",
     "bundle": "webpack --progress --config-name dist",
     "prebench-browser": "webpack --progress --config-name bench-generate",
-    "bench-browser": "npm run prebench-browser && npm run debug --prefix serve-benchmark"
+    "bench-browser": "npm run debug --prefix serve-benchmark"
   },
   "repository": {
     "type": "git",
@@ -69,7 +70,6 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "gl": "^4.4.0",
-    "gpu-compute": "0.0.44",
     "make-dir-cli": "^2.0.0",
     "prettier": "^1.18.2",
     "trash-cli": "^3.0.0",
@@ -78,5 +78,7 @@
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7"
   },
-  "dependencies": {}
+  "dependencies": {
+    "gpu-compute": "^0.1.1"
+  }
 }
