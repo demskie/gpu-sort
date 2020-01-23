@@ -5,3 +5,4 @@ node_modules
 /bench
 /test
 *.bundle.js
+.DS_Store

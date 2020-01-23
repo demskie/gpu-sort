@@ -7,9 +7,17 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "double"],
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "no-var": 0,
+    "prefer-const": "off",
+    "quotes": "off",
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/class-name-casing": 0
   }
 }
