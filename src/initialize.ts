@@ -37,18 +37,6 @@ var sort32MediumShaders: gpu.ComputeShader[] | undefined;
 var sort32LargeShaders: gpu.ComputeShader[] | undefined;
 var untransform32Shader: gpu.ComputeShader | undefined;
 
-const transform16 = readFileSync(require.resolve("./shaders/00_transform16.frag"), "utf8");
-const sort16Small = readFileSync(require.resolve("./shaders/01_sort16_small.frag"), "utf8");
-const sort16Medium = readFileSync(require.resolve("./shaders/01_sort16_medium.frag"), "utf8");
-const sort16Large = readFileSync(require.resolve("./shaders/01_sort16_large.frag"), "utf8");
-const untransform16 = readFileSync(require.resolve("./shaders/02_untransform16.frag"), "utf8");
-
-var transform16Shader: gpu.ComputeShader | undefined;
-var sort16SmallShader: gpu.ComputeShader | undefined;
-var sort16MediumShaders: gpu.ComputeShader[] | undefined;
-var sort16LargeShaders: gpu.ComputeShader[] | undefined;
-var untransform16Shader: gpu.ComputeShader | undefined;
-
 export function getTransform64Shader() {
   if (!transform64Shader) transform64Shader = new gpu.ComputeShader(transform64, shared.searchAndReplace);
   return transform64Shader;
@@ -127,45 +115,6 @@ export function getUntransform32Shader() {
   return untransform32Shader;
 }
 
-export function getTransform16Shader() {
-  if (!transform16Shader) transform16Shader = new gpu.ComputeShader(transform16, shared.searchAndReplace);
-  return transform16Shader;
-}
-
-export function getSort16SmallShader() {
-  if (!sort16SmallShader) sort16SmallShader = new gpu.ComputeShader(sort16Small, shared.searchAndReplace);
-  return sort16SmallShader;
-}
-
-export function getSort16MediumShaders() {
-  if (!sort16MediumShaders) {
-    const arr = [];
-    for (var s of byteStrings.slice(0, 4)) {
-      s = sort16Medium.replace("texture2D(u_firstBytes", s);
-      arr.push(new gpu.ComputeShader(s, shared.searchAndReplace));
-    }
-    sort16MediumShaders = arr;
-  }
-  return sort16MediumShaders;
-}
-
-export function getSort16LargeShaders() {
-  if (!sort16LargeShaders) {
-    const arr = [];
-    for (var s of byteStrings.slice(0, 8)) {
-      s = sort16Large.replace("texture2D(u_firstBytes", s);
-      arr.push(new gpu.ComputeShader(s, shared.searchAndReplace));
-    }
-    sort16LargeShaders = arr;
-  }
-  return sort16LargeShaders;
-}
-
-export function getUntransform16Shader() {
-  if (!untransform16Shader) untransform16Shader = new gpu.ComputeShader(untransform16, shared.searchAndReplace);
-  return untransform16Shader;
-}
-
 export function initializeMostShaders() {
   getTransform64Shader();
   getSort64SmallShader();
@@ -174,10 +123,6 @@ export function initializeMostShaders() {
   getTransform32Shader();
   getSort32SmallShader();
   getUntransform32Shader();
-
-  getTransform16Shader();
-  getSort16SmallShader();
-  getUntransform16Shader();
 }
 
 export function initializeAllShaders() {
@@ -192,10 +137,4 @@ export function initializeAllShaders() {
   getSort32MediumShaders();
   getSort32SmallShader();
   getUntransform32Shader();
-
-  getTransform16Shader();
-  getSort16LargeShaders();
-  getSort16MediumShaders();
-  getSort16SmallShader();
-  getUntransform16Shader();
 }

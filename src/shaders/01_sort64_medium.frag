@@ -132,8 +132,8 @@ void main() {
 	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * localDataOne.rgba / 255.0
-				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * localDataTwo.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * peerDataOne.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * peerDataTwo.rgba / 255.0;
+	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * localDataOne.rgba
+				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * localDataTwo.rgba
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * peerDataOne.rgba
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * peerDataTwo.rgba;
 }

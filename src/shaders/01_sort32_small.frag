@@ -13,7 +13,6 @@ uniform float u_regionSizeY;
 
 float round(float);
 float floatEquals(float, float);
-float floatNotEquals(float, float);
 float floatLessThan(float, float);
 float floatGreaterThan(float, float);
 float floatLessThanOrEqual(float, float);
@@ -39,12 +38,12 @@ void main() {
 	vec2 descendingStartCoord = vec2(ascendingStartCoord.xy) + halfRegionOffset;
 
 	// get booleans for determining relative position and sorting order
-	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
-	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
-	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
-					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
+	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
+	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) *
+						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));
+    float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
+                               floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
 
 	// get current data
 	vec4 localData = texture2D(u_firstBytes, vec2(gl_FragCoord.xy) / u_width);
@@ -86,6 +85,6 @@ void main() {
 	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * localData.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * peerData.rgba / 255.0;
+	gl_FragColor = floatEquals(notSwapBool, 1.0) * localData.rgba
+				 + floatEquals(notSwapBool, 0.0) * peerData.rgba;
 }

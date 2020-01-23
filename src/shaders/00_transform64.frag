@@ -8,6 +8,8 @@ uniform sampler2D u_bytes;
 uniform float u_width;
 uniform float u_mode;
 uniform float u_endianness;
+uniform float u_dataDelimX;
+uniform float u_dataDelimY;
 
 const float PASSTHROUGH = 0.0;
 const float INTEGER = 1.0;
@@ -30,16 +32,10 @@ void main() {
 	vec4 texelTwo = texture2D(u_bytes, vec2(baseFragCoord.xy + vec2(1.5, 0.5)) / u_width);
 
 	// reorder if endianness if not little endian
-	vec4 reorderedOne = floatEquals(u_endianness, LITTLE_ENDIAN) * texelOne.rgba;
-	vec4 reorderedTwo = floatEquals(u_endianness, LITTLE_ENDIAN) * texelTwo.rgba;
-	reorderedOne.r += floatEquals(u_endianness, BIG_ENDIAN) * texelTwo.a;
-	reorderedOne.g += floatEquals(u_endianness, BIG_ENDIAN) * texelTwo.b;
-	reorderedOne.b += floatEquals(u_endianness, BIG_ENDIAN) * texelTwo.g;
-	reorderedOne.a += floatEquals(u_endianness, BIG_ENDIAN) * texelTwo.r;
-	reorderedTwo.r += floatEquals(u_endianness, BIG_ENDIAN) * texelOne.a;
-	reorderedTwo.g += floatEquals(u_endianness, BIG_ENDIAN) * texelOne.b;
-	reorderedTwo.b += floatEquals(u_endianness, BIG_ENDIAN) * texelOne.g;
-	reorderedTwo.a += floatEquals(u_endianness, BIG_ENDIAN) * texelOne.r;
+	vec4 reorderedOne = floatEquals(u_endianness, LITTLE_ENDIAN) * texelOne.rgba
+                      + floatEquals(u_endianness, BIG_ENDIAN) * texelTwo.abgr;
+	vec4 reorderedTwo = floatEquals(u_endianness, LITTLE_ENDIAN) * texelTwo.rgba
+                      + floatEquals(u_endianness, BIG_ENDIAN) * texelOne.abgr;
 
 	// denormalize texel data
 	texelOne = 255.0 * reorderedOne;
@@ -50,7 +46,7 @@ void main() {
 	vec4 flippedTwo = floatEquals(u_mode, PASSTHROUGH) * texelTwo.rgba;
 
 	// determine if we should flip the bits or not
-	float signBitIsSet = floatGreaterThanOrEqual(round(texelTwo.a), 128.0);
+	float signBitIsSet = floatGreaterThanOrEqual(floor(texelTwo.a), 128.0);
 
 	// for integers just flip the sign bit
 	flippedOne.r += floatEquals(u_mode, INTEGER) * texelOne.r;
@@ -82,6 +78,11 @@ void main() {
 			      + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * (255.0 - texelTwo.a);
 
 	// output denormalized bytes
-	gl_FragColor = floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * (flippedOne.rgba / 255.0)
-				 + floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * (flippedTwo.rgba / 255.0);
+	gl_FragColor = floatEquals(floor(mod(floor(gl_FragCoord.x), 2.0)), 0.0) * (flippedOne.rgba / 255.0)
+				 + floatEquals(floor(mod(floor(gl_FragCoord.x), 2.0)), 1.0) * (flippedTwo.rgba / 255.0);
+
+    // zeroize all out of bounds data
+    gl_FragColor *= max(floatLessThan(floor(gl_FragCoord.x), u_dataDelimX), 
+                        floatLessThan(floor(gl_FragCoord.y), u_dataDelimY));
+    gl_FragColor *= floatLessThanOrEqual(floor(gl_FragCoord.y), u_dataDelimY);
 }

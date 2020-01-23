@@ -1,34 +1,42 @@
+import * as gpu from "gpu-compute";
 import * as shared from "./shared";
 import * as init from "./initialize";
-import * as sort from "./bitonicsort";
+import { getParameters } from "./parameters";
+import { BitonicUniformGenerator } from "./uniforms";
 
 export { setWebGLContext } from "gpu-compute";
 
-function bitonicSort(array: shared.SortableTypedArrays, constructorName: string, forceCPU?: boolean) {
-  const minBytes = 256 * 256 * array.BYTES_PER_ELEMENT;
-  if (forceCPU || !gpuProcessingEnabled || array.buffer.byteLength < minBytes) return shared.nativeSort(array);
+export function bitonicSort(array: shared.SortableTypedArrays, constructor: string, forceCPU?: boolean) {
+  if (forceCPU) return shared.nativeSort(array);
   const bytes = new Uint8Array(array.buffer);
-  const targets = shared.createTargets(bytes);
-  sort.bitonicSort(targets, constructorName);
-  const width = targets[targets.length - 1].width;
-  const targetByteLength = width * width * 4;
-  let start = 0;
-  let overflowing = bytes.length % targetByteLength !== 0;
-  for (let target of targets) {
-    if (target.width === 1) continue;
-    if (!overflowing) {
-      target.readPixels(bytes.subarray(start, start + targetByteLength));
-      start += targetByteLength;
-    } else {
-      const extraHoriz = (bytes.length / 4) % width;
-      const startY = width - Math.floor(bytes.length / 4 / width);
-      const startX = startY < width ? extraHoriz : 0;
-      const pixels = target.readSomePixels(startX, startY, width, width);
-      const extraByteCount = extraHoriz * 4 + startY * width * 4;
-      bytes.set(pixels.subarray(extraByteCount));
-      start += targetByteLength - extraByteCount;
-      overflowing = false;
+  const targets = shared.createTargets(bytes, constructor);
+  const leftovers = shared.getLeftoverPixelCount(bytes, targets);
+  const parameters = getParameters(targets, constructor);
+  const uniformGenerator = new BitonicUniformGenerator(constructor, targets, leftovers);
+  for (let uniforms of uniformGenerator.generateTransformerUniforms()) {
+    let target = uniforms.u_bytes;
+    target.compute(parameters.transformShader, uniforms);
+  }
+  for (let uniforms of uniformGenerator.generateSorterUniforms()) {
+    for (let j = 0; j < targets.length; j++) {
+      targets[j].compute(parameters.sortShaders[j], uniforms);
     }
+    gpu.getWebGLContext().flush();
+  }
+  for (let uniforms of uniformGenerator.generateUntransformerUniforms()) {
+    let target = uniforms.u_bytes;
+    target.compute(parameters.untransformShader, uniforms);
+  }
+  let start = 0;
+  for (let target of targets) {
+    const targetBytes = target.width * target.width * 4;
+    if (start + targetBytes <= bytes.length) {
+      target.readPixels(bytes.subarray(start, start + targetBytes));
+    } else {
+      const allPixels = target.readPixels();
+      bytes.set(allPixels.subarray(-bytes.length));
+    }
+    start += targetBytes;
   }
 }
 
@@ -36,17 +44,17 @@ function checkConstructor(array: shared.SortableTypedArrays, expectedType: strin
   return Object.prototype.toString.call(array) === `[object ${expectedType}]`;
 }
 
-export function sortByNumber(array: any[], getter: (elem: any) => number) {}
+// export function sortByNumber(array: any[], getter: (elem: any) => number) {}
 
-export function sortInt16Array(array: Int16Array, forceCPU?: boolean) {
-  if (checkConstructor(array, "Int16Array")) return bitonicSort(array, "Int16Array", forceCPU);
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Int16Array`);
-}
+// export function sortInt16Array(array: Int16Array, forceCPU?: boolean) {
+//   if (checkConstructor(array, "Int16Array")) return bitonicSort(array, "Int16Array", forceCPU);
+//   throw new Error(`array parameter of '${array.constructor.name}' was not a Int16Array`);
+// }
 
-export function sortUint16Array(array: Uint16Array, forceCPU?: boolean) {
-  if (checkConstructor(array, "Uint16Array")) return bitonicSort(array, "Uint16Array", forceCPU);
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Uint16Array`);
-}
+// export function sortUint16Array(array: Uint16Array, forceCPU?: boolean) {
+//   if (checkConstructor(array, "Uint16Array")) return bitonicSort(array, "Uint16Array", forceCPU);
+//   throw new Error(`array parameter of '${array.constructor.name}' was not a Uint16Array`);
+// }
 
 export function sortInt32Array(array: Int32Array, forceCPU?: boolean) {
   if (checkConstructor(array, "Int32Array")) return bitonicSort(array, "Int32Array", forceCPU);

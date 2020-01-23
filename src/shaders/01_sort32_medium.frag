@@ -100,6 +100,6 @@ void main() {
 	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * localData.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * peerData.rgba / 255.0;
+	gl_FragColor = floatEquals(notSwapBool, 1.0) * localData.rgba
+				 + floatEquals(notSwapBool, 0.0) * peerData.rgba;
 }

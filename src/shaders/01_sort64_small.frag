@@ -13,7 +13,6 @@ uniform float u_regionSizeY;
 
 float round(float);
 float floatEquals(float, float);
-float floatNotEquals(float, float);
 float floatLessThan(float, float);
 float floatGreaterThan(float, float);
 float floatLessThanOrEqual(float, float);
@@ -47,12 +46,12 @@ void main() {
 	vec2 descendingStartCoord = vec2(ascendingStartCoord.xy) + halfRegionOffset;
 
 	// get booleans for determining relative position and sorting order
-	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
-	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
-	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
-					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
+	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
+	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) * 
+						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));		   
+	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
+					           floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
 
 	// get current data
 	vec2 localDataCoord = vec2(floor(gl_FragCoord.x) - mod(floor(gl_FragCoord.x), 2.0), gl_FragCoord.y);
@@ -115,8 +114,8 @@ void main() {
 	notSwapBool += floatEquals(notSwapBool, 0.0) * floatEquals(swapBool, 0.0);
 
 	// use booleans to render the correct texel
-	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * localDataOne.rgba / 255.0
-				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * localDataTwo.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * peerDataOne.rgba / 255.0
-				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * peerDataTwo.rgba / 255.0;
+	gl_FragColor = floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * localDataOne.rgba
+				 + floatEquals(notSwapBool, 1.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * localDataTwo.rgba
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 0.0) * peerDataOne.rgba
+				 + floatEquals(notSwapBool, 0.0) * floatEquals(mod(floor(gl_FragCoord.x), 2.0), 1.0) * peerDataTwo.rgba;
 }

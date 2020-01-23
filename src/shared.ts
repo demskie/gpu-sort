@@ -1,39 +1,35 @@
 import * as gpu from "gpu-compute";
 
-export function createTargets(bytes: Uint8Array) {
-  const targets = [];
-  const limit = 4096; // could be up to 16384
-  const width = determineTargetWidth(bytes.length, limit);
-  const targetSize = width * width * 4;
-  for (let totalTargets of [1, 4, 8]) {
-    if (bytes.length > totalTargets * targetSize) continue;
-    for (let i = totalTargets - 1; i >= 0; i--) {
-      if (bytes.length > targetSize * i) {
-        const renderTarget = new gpu.RenderTarget(width);
-        const subarr = bytes.subarray(targetSize * i, targetSize * (i + 1));
-        renderTarget.pushTextureData(subarr);
-        targets.push(renderTarget);
-      } else {
-        targets.push(getEmptyRenderTarget());
+export function createTargets(bytes: Uint8Array, constructor: string) {
+  if (bytes.length % 4 !== 0) {
+    const arr = new Uint8Array(bytes.length - (bytes.length % 4) + 4);
+    arr.set(bytes);
+    bytes = arr;
+  }
+  const gl = gpu.getWebGLContext();
+  const framebufferLimit = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+  const framebufferByteCount = framebufferLimit * framebufferLimit * 4;
+  for (var aggregateWidth = 1; aggregateWidth <= 8 * framebufferLimit; aggregateWidth *= 2) {
+    if (aggregateWidth * aggregateWidth * 4 >= bytes.length) {
+      const aggregateByteCount = aggregateWidth * aggregateWidth * 4;
+      const targetWidth = Math.min(framebufferLimit, aggregateWidth);
+      let targetByteCount = targetWidth * targetWidth * 4;
+      if (constructor.includes("64Array")) targetByteCount *= 2;
+      for (let targetCount of [1, 4, 8]) {
+        if (targetCount * framebufferByteCount >= aggregateByteCount) {
+          const targets = [];
+          for (let i = targetCount - 1; i >= 0; i--) {
+            const renderTarget = new gpu.RenderTarget(targetWidth);
+            const subarr = bytes.subarray(targetByteCount * i, targetByteCount * (i + 1));
+            renderTarget.pushTextureData(subarr);
+            targets.push(renderTarget);
+          }
+          return targets;
+        }
       }
     }
-    break;
   }
-  return targets;
-}
-
-function determineTargetWidth(byteLength: number, widthLimit: number) {
-  for (var width = 16; width <= widthLimit; width *= 2) {
-    if (width * width * 4 >= byteLength) return width;
-  }
-  throw new Error(`data overflows ${widthLimit}x${widthLimit} framebuffer`);
-}
-
-var emptyRenderTarget: gpu.RenderTarget | undefined;
-
-function getEmptyRenderTarget() {
-  if (!emptyRenderTarget) emptyRenderTarget = new gpu.RenderTarget(1);
-  return emptyRenderTarget;
+  throw new Error(`data overflows eight ${framebufferLimit}x${framebufferLimit} framebuffers`);
 }
 
 export const isBigEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
@@ -50,7 +46,7 @@ export const searchAndReplace = {
   "vec2 uint16ToVec2(float);": gpu.functionStrings.uint16ToVec2
 };
 
-export function isSorted(array: ArrayLike<Number>) {
+export function isSorted(array: ArrayLike<number>) {
   for (let i = 0; i < array.length - 1; i++) {
     if (array[i] > array[i + 1]) return false;
   }
@@ -89,4 +85,8 @@ export function shuffle(array: number[] | SortableTypedArrays) {
     let rnum = Math.floor(Math.random() * len);
     [array[len - 1], array[rnum]] = [array[rnum], array[len - 1]];
   }
+}
+
+export function getLeftoverPixelCount(src: Uint8Array, dst: gpu.RenderTarget[]) {
+  return dst[0].width * dst[0].width * dst.length - src.length / 4;
 }

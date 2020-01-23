@@ -28,11 +28,8 @@ void main() {
 	vec4 texel = texture2D(u_bytes, vec2(gl_FragCoord.xy) / u_width);
 
 	// reorder if endianness if not little endian
-	vec4 reordered = floatEquals(u_endianness, LITTLE_ENDIAN) * texel.rgba;
-	reordered.r += floatEquals(u_endianness, BIG_ENDIAN) * texel.a;
-	reordered.g += floatEquals(u_endianness, BIG_ENDIAN) * texel.b;
-	reordered.b += floatEquals(u_endianness, BIG_ENDIAN) * texel.g;
-	reordered.a += floatEquals(u_endianness, BIG_ENDIAN) * texel.r;
+	vec4 reordered = floatEquals(u_endianness, LITTLE_ENDIAN) * texel.rgba 
+                   + floatEquals(u_endianness, BIG_ENDIAN) * texel.abgr;
 
 	// denormalize texel data
 	texel = 255.0 * reordered;
@@ -41,7 +38,7 @@ void main() {
 	vec4 flipped = floatEquals(u_mode, PASSTHROUGH) * texel.rgba;
 
 	// determine if we should flip the bits or not
-	float signBitIsSet = floatGreaterThanOrEqual(round(texel.a), 128.0);
+	float signBitIsSet = floatGreaterThanOrEqual(floor(texel.a), 128.0);
 
 	// for integers just flip the sign bit
 	flipped.r += floatEquals(u_mode, INTEGER) * texel.r;

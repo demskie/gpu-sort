@@ -4,7 +4,7 @@
   "description": "gpu accelerated stable sort",
   "main": "lib/index.js",
   "scripts": {
-    "test": "ts-node src/tests/index.test.ts",
+    "test": "tsc --noEmit && jest --runInBand",
     "prebuild": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/",
     "build": "tsc",
     "inline-shaders": "babel --no-babelrc --config-file ./.babelrc-only-static-fs lib/initialize.js --out-file lib/initialize.js",
@@ -43,6 +43,46 @@
   "browserslist": [
     "node 6.5"
   ],
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "testRegex": [
+      ".*.test\\.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "node"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json",
+        "diagnostics": false
+      }
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/config/",
+      "<rootDir>/build/",
+      "<rootDir>/src/mockdata/",
+      "<rootDir>/src/benchmarks/"
+    ],
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "!**/tests/**",
+      "!**/benchmarks/**",
+      "!**/*.bench.ts",
+      "!**/*.mock.ts",
+      "!**/node_modules/**",
+      "!**/vendor/**",
+      "**/*.ts"
+    ]
+  },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
     "@babel/core": "^7.6.0",
@@ -53,6 +93,7 @@
     "@babel/preset-typescript": "^7.6.0",
     "@babel/runtime-corejs3": "^7.6.0",
     "@types/benchmark": "^1.0.31",
+    "@types/jest": "^24.9.0",
     "@types/node": "^12.7.2",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
@@ -70,15 +111,17 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "gl": "^4.4.0",
+    "jest": "^24.9.0",
     "make-dir-cli": "^2.0.0",
     "prettier": "^1.18.2",
     "trash-cli": "^3.0.0",
+    "ts-jest": "^24.3.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.2",
     "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
-    "gpu-compute": "^0.1.1"
+    "gpu-compute": "^0.1.3"
   }
 }
