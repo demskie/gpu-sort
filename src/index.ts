@@ -1,5 +1,5 @@
 import * as init from "./initialize";
-import { bitonicSort } from "./bitonicSort";
+import { bitonicSort } from "./sort";
 
 export { setWebGLContext } from "gpu-compute";
 

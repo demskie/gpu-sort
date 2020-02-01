@@ -66,7 +66,7 @@ function pullPixels(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
 async function pullPixelsAsync(target: gpu.RenderTarget, e: number, bytes: Uint8Array, timer: Timer) {
   return new Promise(async function(resolve) {
     const w = target.width;
-    const heightLimit = Math.max((256 * 256) / w, 1);
+    const heightLimit = Math.max((128 * 128) / w, 1);
     if (e % w === 0) {
       for (let y = Math.floor(e / w); y < w; y += heightLimit) {
         const h = y + heightLimit > w ? w - y : heightLimit;
