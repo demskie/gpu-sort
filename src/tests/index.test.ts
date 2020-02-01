@@ -4,6 +4,10 @@ beforeAll(() => {
   index.setWebGLContext(require("gl")(1, 1));
 });
 
+beforeEach(() => {
+  jest.setTimeout(5000 * 5);
+});
+
 test("testFloat32", () => {
   let n = 123 * 321;
   let alpha = new Float32Array(Array.from(Array(n), () => Math.random() - 0.5));
