@@ -1,6 +1,6 @@
 import * as gpu from "gpu-compute";
 import * as index from "./index";
-import { BitonicUniformGenerator } from "./bitonicUniforms";
+import { BitonicUniformGenerator } from "./uniforms";
 
 class Timer {
   private t = Date.now();

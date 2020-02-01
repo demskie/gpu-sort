@@ -1,6 +1,6 @@
 import * as gpu from "gpu-compute";
 import { Uniforms } from "gpu-compute/lib/renderTarget";
-import { getBitonicParameters, bitonicParameters, TRANSFORM_MODE } from "./bitonicParameters";
+import { getBitonicParameters, bitonicParameters, TRANSFORM_MODE } from "./parameters";
 
 export const isBigEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
 export const isLittleEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x78;
