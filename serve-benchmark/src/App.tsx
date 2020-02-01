@@ -1,31 +1,20 @@
 import React from "react";
+import ReactLoading from "react-loading";
 
-const generator = (window as any).gpuSortGenerate.default() as IterableIterator<Promise<unknown>>;
+const startBenchmarking = (window as any).gpuSortGenerate.default.startBenchmarking as () => void;
+const getBenchmarkText = (window as any).gpuSortGenerate.default.getBenchmarkText as () => string;
+const isBenchmarking = (window as any).gpuSortGenerate.default.isBenchmarking as () => boolean;
 
 interface AppState {
   output: string;
+  benchmarking: boolean;
 }
 
 export default class App extends React.Component<{}, AppState> {
-  state = {
-    output: ""
-  } as AppState;
+  state = { output: getBenchmarkText() } as AppState;
 
   componentDidMount = () => {
-    generator.next().value.then((output: string) => {
-      this.setState({ output });
-    });
-  };
-
-  updateOutputString = () => {
-    const result = generator.next();
-    if (result.value) {
-      result.value.then((output: string) => {
-        this.setState({ output }, () => {
-          if (!result.done) setTimeout(() => this.updateOutputString(), 500);
-        });
-      });
-    }
+    setInterval(() => this.setState({ output: getBenchmarkText(), benchmarking: isBenchmarking() }), 100);
   };
 
   render() {
@@ -42,18 +31,29 @@ export default class App extends React.Component<{}, AppState> {
             fontSize: "16px"
           }}
         >
-          <button
-            style={{
-              margin: "20px",
-              paddingTop: "5px",
-              paddingBottom: "5px",
-              paddingLeft: "15px",
-              paddingRight: "15px"
-            }}
-            onClick={this.updateOutputString}
-          >
-            Start Benchmark
-          </button>
+          {(() => {
+            if (!this.state.benchmarking) {
+              return (
+                <button
+                  style={{
+                    margin: "20px",
+                    paddingTop: "5px",
+                    paddingBottom: "5px",
+                    paddingLeft: "15px",
+                    paddingRight: "15px",
+                    height: "30px"
+                  }}
+                  onClick={() => {
+                    startBenchmarking();
+                  }}
+                >
+                  Start Benchmark
+                </button>
+              );
+            } else {
+              return <ReactLoading type={"cylon"} color={"white"} height={70} width={70} />;
+            }
+          })()}
           <div
             style={{
               width: "380px",

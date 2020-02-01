@@ -7,93 +7,73 @@ export enum TRANSFORM_MODE {
   FLOAT = 2
 }
 
+export enum CONSTRUCTOR_MODE {
+  Int32Array = 0,
+  Uint32Array = 1,
+  Float32Array = 2,
+  Float64Array = 3,
+  BigInt64Array = 4,
+  BigUint64Array = 5
+}
+
 export interface bitonicParameters {
   mode: TRANSFORM_MODE;
-  sortShaders: gpu.ComputeShader[];
+  constructor: CONSTRUCTOR_MODE;
   transformShader: gpu.ComputeShader;
+  sortShader: gpu.ComputeShader;
   untransformShader: gpu.ComputeShader;
 }
 
-export function getParameters(byteSlices: gpu.RenderTarget[], constructorName: string) {
-  let mode: TRANSFORM_MODE;
-  let sortShaders = [] as gpu.ComputeShader[];
-  let transformShader: gpu.ComputeShader;
-  let untransformShader: gpu.ComputeShader;
+export function getBitonicParameters(constructorName: string): bitonicParameters {
   switch (constructorName) {
     case "Int32Array":
-      mode = TRANSFORM_MODE.INTEGER;
-      transformShader = init.getTransform32Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort32SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort32MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort32LargeShaders();
-      }
-      untransformShader = init.getUntransform32Shader();
-      break;
+      return {
+        mode: TRANSFORM_MODE.INTEGER,
+        constructor: CONSTRUCTOR_MODE.Int32Array,
+        transformShader: init.getTransform32Shader(),
+        sortShader: init.getSort32Shader(),
+        untransformShader: init.getUntransform32Shader()
+      };
     case "Uint32Array":
-      mode = TRANSFORM_MODE.PASSTHROUGH;
-      transformShader = init.getTransform32Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort32SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort32MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort32LargeShaders();
-      }
-      untransformShader = init.getUntransform32Shader();
-      break;
+      return {
+        mode: TRANSFORM_MODE.PASSTHROUGH,
+        constructor: CONSTRUCTOR_MODE.Uint32Array,
+        transformShader: init.getTransform32Shader(),
+        sortShader: init.getSort32Shader(),
+        untransformShader: init.getUntransform32Shader()
+      };
     case "Float32Array":
-      mode = TRANSFORM_MODE.FLOAT;
-      transformShader = init.getTransform32Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort32SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort32MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort32LargeShaders();
-      }
-      untransformShader = init.getUntransform32Shader();
-      break;
+      return {
+        mode: TRANSFORM_MODE.FLOAT,
+        constructor: CONSTRUCTOR_MODE.Float32Array,
+        transformShader: init.getTransform32Shader(),
+        sortShader: init.getSort32Shader(),
+        untransformShader: init.getUntransform32Shader()
+      };
     case "Float64Array":
-      mode = TRANSFORM_MODE.FLOAT;
-      transformShader = init.getTransform64Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort64SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort64MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort64LargeShaders();
-      }
-      untransformShader = init.getUntransform64Shader();
-      break;
+      return {
+        mode: TRANSFORM_MODE.FLOAT,
+        constructor: CONSTRUCTOR_MODE.Float64Array,
+        transformShader: init.getTransform64Shader(),
+        sortShader: init.getSort64Shader(),
+        untransformShader: init.getUntransform64Shader()
+      };
     case "BigInt64Array":
-      mode = TRANSFORM_MODE.INTEGER;
-      transformShader = init.getTransform64Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort64SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort64MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort64LargeShaders();
-      }
-      untransformShader = init.getUntransform64Shader();
-      break;
+      return {
+        mode: TRANSFORM_MODE.INTEGER,
+        constructor: CONSTRUCTOR_MODE.BigInt64Array,
+        transformShader: init.getTransform64Shader(),
+        sortShader: init.getSort64Shader(),
+        untransformShader: init.getUntransform64Shader()
+      };
     case "BigUint64Array":
-      mode = TRANSFORM_MODE.PASSTHROUGH;
-      transformShader = init.getTransform64Shader();
-      if (byteSlices.length === 1) {
-        sortShaders = [init.getSort64SmallShader()];
-      } else if (byteSlices.length <= 4) {
-        sortShaders = init.getSort64MediumShaders();
-      } else if (byteSlices.length <= 8) {
-        sortShaders = init.getSort64LargeShaders();
-      }
-      untransformShader = init.getUntransform64Shader();
-      break;
-    default:
-      throw new Error(`unsupported constructor.name: ${constructorName}`);
+      return {
+        mode: TRANSFORM_MODE.PASSTHROUGH,
+        constructor: CONSTRUCTOR_MODE.BigUint64Array,
+        transformShader: init.getTransform64Shader(),
+        sortShader: init.getSort64Shader(),
+        untransformShader: init.getUntransform64Shader()
+      };
   }
-  return { mode, sortShaders, transformShader, untransformShader } as bitonicParameters;
+  throw new Error(`unsupported constructor.name: ${constructorName}`);
 }

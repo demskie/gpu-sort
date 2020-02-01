@@ -4,7 +4,7 @@ precision mediump int;
 precision mediump sampler2D;
 #endif
 
-uniform sampler2D u_firstBytes;
+uniform sampler2D u_bytes;
 uniform float u_width;
 uniform float u_blockSizeX;
 uniform float u_blockSizeY;
@@ -46,12 +46,12 @@ void main() {
                                floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
 
 	// get current data
-	vec4 localData = texture2D(u_firstBytes, vec2(gl_FragCoord.xy) / u_width);
+	vec4 localData = texture2D(u_bytes, vec2(gl_FragCoord.xy) / u_width);
 
 	// get peer data
 	vec2 peerFragCoord = floatEquals(firstTexelBool, 1.0) * (gl_FragCoord.xy + halfBlockOffset)
 					   + floatEquals(firstTexelBool, 0.0) * (gl_FragCoord.xy - halfBlockOffset);
-	vec4 peerData = texture2D(u_firstBytes, vec2(peerFragCoord.xy) / u_width);
+	vec4 peerData = texture2D(u_bytes, vec2(peerFragCoord.xy) / u_width);
 
 	// create alpha and bravo texels where alpha is expected to be less than bravo
 	vec4 alphaData = floatEquals(firstTexelBool, 1.0) * floatEquals(ascendingGroupBool, 1.0) * localData.rgba

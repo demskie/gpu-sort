@@ -65,8 +65,8 @@ void main() {
 			      + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 0.0) * (255.0 - texelOne.g);
 	flippedOne.b += floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * texelOne.b
 			      + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 0.0) * (255.0 - texelOne.b);
-	flippedOne.a += floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * texelOne.b
-			      + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 0.0) * (255.0 - texelOne.b);
+	flippedOne.a += floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * texelOne.a
+			      + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 0.0) * (255.0 - texelOne.a);
 	flippedTwo.r += floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * texelTwo.r
 				  + floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 0.0) * (255.0 - texelTwo.r);
 	flippedTwo.g += floatEquals(u_mode, FLOAT) * floatEquals(signBitIsSet, 1.0) * texelTwo.g

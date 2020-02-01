@@ -4,10 +4,7 @@ precision mediump int;
 precision mediump sampler2D;
 #endif
 
-uniform sampler2D u_firstBytes;
-uniform sampler2D u_secondBytes;
-uniform sampler2D u_thirdBytes;
-uniform sampler2D u_fourthBytes;
+uniform sampler2D u_bytes;
 uniform float u_width;
 uniform float u_blockSizeX;
 uniform float u_blockSizeY;
@@ -16,7 +13,6 @@ uniform float u_regionSizeY;
 
 float round(float);
 float floatEquals(float, float);
-float floatNotEquals(float, float);
 float floatLessThan(float, float);
 float floatGreaterThan(float, float);
 float floatLessThanOrEqual(float, float);
@@ -42,7 +38,7 @@ void main() {
 
 	// calculate starting coordinates for each sorting region
 	vec2 ascendingStartCoord  = vec2(gl_FragCoord.x - floor(mod(floor(gl_FragCoord.x), dblRegionSizeX)),
-                            		 gl_FragCoord.y - floor(mod(floor(gl_FragCoord.y), dblRegionSizeY)));
+									 gl_FragCoord.y - floor(mod(floor(gl_FragCoord.y), dblRegionSizeY)));
 	vec2 regionOffset         = vec2(floatEquals(dblRegionSizeY, 1.0) * dblRegionSizeX, floatGreaterThan(dblRegionSizeY, 1.0) * dblRegionSizeY);
 	vec2 halfRegionOffset     = vec2(floatEquals(regionOffset.y, 0.0) * regionOffset.x / 2.0 +
 									 floatEquals(regionOffset.y, 1.0) * floatEquals(regionOffset.x, 0.0) * u_width / 2.0, 
@@ -50,37 +46,23 @@ void main() {
 	vec2 descendingStartCoord = vec2(ascendingStartCoord.xy) + halfRegionOffset;
 
 	// get booleans for determining relative position and sorting order
-	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), round(descendingStartCoord.y));
-	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), round(descendingStartCoord.y)) * 
-						       floatLessThan(floor(gl_FragCoord.x), round(descendingStartCoord.x));		   
-	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), round(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), round(blockMiddleCoord.y)) * 
-					           floatLessThan(floor(gl_FragCoord.x), round(blockMiddleCoord.x));
+	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
+	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) * 
+						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));		   
+	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
+					           floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
 
 	// get current data
 	vec2 localDataCoord = vec2(floor(gl_FragCoord.x) - mod(floor(gl_FragCoord.x), 2.0), gl_FragCoord.y);
-	vec4 localDataOne = texture2D(u_firstBytes, vec2(localDataCoord.xy + vec2(0.5, 0.0)) / u_width); // replace: u_firstBytes with appropriate uniform
-	vec4 localDataTwo = texture2D(u_firstBytes, vec2(localDataCoord.xy + vec2(1.5, 0.0)) / u_width); // replace: u_firstBytes with appropriate uniform
-
-	// calculate peer coordinates
-	vec2 peerFragCoord = floatEquals(firstTexelBool, 1.0) * (localDataCoord.xy + halfBlockOffset)
-					   + floatEquals(firstTexelBool, 0.0) * (localDataCoord.xy - halfBlockOffset);
-
-	// determine which peer texture to pull texture from
-	float firstTextureBool   = floatGreaterThan(peerFragCoord.y, 0.0 * u_width) * floatLessThan(peerFragCoord.y, 1.0 * u_width);
-	float secondTextureBool  = floatGreaterThan(peerFragCoord.y, 1.0 * u_width) * floatLessThan(peerFragCoord.y, 2.0 * u_width);
-	float thirdTextureBool   = floatGreaterThan(peerFragCoord.y, 2.0 * u_width) * floatLessThan(peerFragCoord.y, 3.0 * u_width);
-	float fourthTextureBool  = floatGreaterThan(peerFragCoord.y, 3.0 * u_width) * floatLessThan(peerFragCoord.y, 4.0 * u_width);
+	vec4 localDataOne = texture2D(u_bytes, vec2(localDataCoord.xy + vec2(0.5, 0.0)) / u_width);
+	vec4 localDataTwo = texture2D(u_bytes, vec2(localDataCoord.xy + vec2(1.5, 0.0)) / u_width);
 
 	// get peer data
-	vec4 peerDataOne = texture2D(u_firstBytes,   vec2(peerFragCoord.x + 0.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(firstTextureBool, 1.0)
-                	 + texture2D(u_secondBytes,  vec2(peerFragCoord.x + 0.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(secondTextureBool, 1.0)
-                     + texture2D(u_thirdBytes,   vec2(peerFragCoord.x + 0.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(thirdTextureBool, 1.0)
-                     + texture2D(u_fourthBytes,  vec2(peerFragCoord.x + 0.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(fourthTextureBool, 1.0);
-	vec4 peerDataTwo = texture2D(u_firstBytes,   vec2(peerFragCoord.x + 1.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(firstTextureBool, 1.0)
-                	 + texture2D(u_secondBytes,  vec2(peerFragCoord.x + 1.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(secondTextureBool, 1.0)
-                     + texture2D(u_thirdBytes,   vec2(peerFragCoord.x + 1.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(thirdTextureBool, 1.0)
-                     + texture2D(u_fourthBytes,  vec2(peerFragCoord.x + 1.5, mod(peerFragCoord.y, u_width)) / u_width) * floatEquals(fourthTextureBool, 1.0);
+	vec2 peerFragCoord = floatEquals(firstTexelBool, 1.0) * (localDataCoord.xy + halfBlockOffset)
+					   + floatEquals(firstTexelBool, 0.0) * (localDataCoord.xy - halfBlockOffset);
+	vec4 peerDataOne = texture2D(u_bytes, vec2(peerFragCoord.xy + vec2(0.5, 0.0)) / u_width);
+	vec4 peerDataTwo = texture2D(u_bytes, vec2(peerFragCoord.xy + vec2(1.5, 0.0)) / u_width);
 	
 	// create alpha and bravo texels where alpha is expected to be less than bravo
 	vec4 alphaDataOne = floatEquals(firstTexelBool, 1.0) * floatEquals(ascendingGroupBool, 1.0) * localDataOne.rgba

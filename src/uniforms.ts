@@ -1,75 +1,69 @@
 import * as gpu from "gpu-compute";
 import { Uniforms } from "gpu-compute/lib/renderTarget";
-import * as shared from "./shared";
-import { getParameters, TRANSFORM_MODE } from "./parameters";
+import { getBitonicParameters, bitonicParameters, TRANSFORM_MODE } from "./bitonicParameters";
+
+export const isBigEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x12;
+export const isLittleEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x78;
 
 export class BitonicUniformGenerator {
-  private readonly kind: string;
-  private readonly targets: gpu.RenderTarget[];
-  private readonly leftovers: number;
+  private readonly target: gpu.RenderTarget;
+  private readonly parameters: bitonicParameters;
+  private readonly emptyTexelCount: number;
 
-  constructor(kind: string, targets: gpu.RenderTarget[], leftovers: number) {
-    this.kind = kind;
-    this.targets = targets;
-    this.leftovers = leftovers;
+  constructor(target: gpu.RenderTarget, kind: string, emptyTexelCount: number) {
+    this.target = target;
+    this.parameters = getBitonicParameters(kind);
+    this.emptyTexelCount = emptyTexelCount;
   }
 
-  *generateTransformerUniforms(): IterableIterator<bitonicTransformerUniforms> {
-    const params = getParameters(this.targets, this.kind);
-    if (!shared.isLittleEndian || params.mode !== TRANSFORM_MODE.PASSTHROUGH) {
-      const singleWidth = this.targets[0].width;
-      const singleTexelCount = singleWidth * singleWidth;
-      const totalTexelCount = singleTexelCount * this.targets.length;
-      for (let i = 0; i < this.targets.length; i++) {
-        const x = Math.max((i + 1) * singleTexelCount - (totalTexelCount - this.leftovers), 0);
-        yield {
-          u_bytes: this.targets[i],
-          u_width: singleWidth,
-          u_mode: params.mode,
-          u_endianness: shared.isLittleEndian ? 0 : 1,
-          u_dataDelimX: Math.floor((singleTexelCount - x) % singleWidth),
-          u_dataDelimY: Math.max(Math.floor((singleTexelCount - x) / singleWidth), 1)
-        };
-      }
+  *generateShaderAndUniforms(): IterableIterator<bitonicShaderAndUniforms> {
+    for (let uniforms of this.generateTransformerUniforms())
+      yield { shader: this.parameters.transformShader, uniforms: uniforms };
+    for (let uniforms of this.generateSorterUniforms())
+      yield { shader: this.parameters.sortShader, uniforms: uniforms };
+    for (let uniforms of this.generateUntransformerUniforms())
+      yield { shader: this.parameters.untransformShader, uniforms: uniforms };
+  }
+
+  private *generateTransformerUniforms(): IterableIterator<bitonicTransformerUniforms> {
+    if (!isLittleEndian || this.parameters.mode !== TRANSFORM_MODE.PASSTHROUGH) {
+      const w = this.target.width;
+      const x = w * w - this.emptyTexelCount;
+      yield {
+        u_bytes: this.target,
+        u_width: w,
+        u_mode: this.parameters.mode,
+        u_endianness: isLittleEndian ? 0 : 1,
+        u_dataDelimX: Math.floor(x % w),
+        u_dataDelimY: Math.floor(x / w)
+      };
     }
   }
 
-  *generateSorterUniforms(): IterableIterator<bitonicSorterUniforms> {
-    const singleWidth = this.targets[0].width;
-    const multiWidth = singleWidth * this.targets.length;
-    for (let rs = 4; rs <= 2 * multiWidth * multiWidth; rs *= 2) {
+  private *generateSorterUniforms(): IterableIterator<bitonicSorterUniforms> {
+    const w = this.target.width;
+    for (let rs = 4; rs <= 2 * w * w; rs *= 2) {
       for (let bs = rs / 2; bs > 1; bs /= 2) {
-        const x = {} as bitonicSorterUniforms;
-        x.u_firstBytes = this.targets[0];
-        if (this.targets.length > 1) x.u_secondBytes = this.targets[1];
-        if (this.targets.length > 2) x.u_thirdBytes = this.targets[2];
-        if (this.targets.length > 3) x.u_fourthBytes = this.targets[3];
-        if (this.targets.length > 4) x.u_fifthBytes = this.targets[4];
-        if (this.targets.length > 5) x.u_sixthBytes = this.targets[5];
-        if (this.targets.length > 6) x.u_seventhBytes = this.targets[6];
-        if (this.targets.length > 7) x.u_eighthBytes = this.targets[7];
-        x.u_width = singleWidth;
-        x.u_blockSizeX = Math.floor(bs % multiWidth) > 0 ? Math.floor(bs % multiWidth) : multiWidth;
-        x.u_blockSizeY = Math.max(Math.floor(bs / multiWidth), 1);
-        x.u_regionSizeX = Math.floor(rs % multiWidth) > 0 ? Math.floor(rs % multiWidth) : multiWidth;
-        x.u_regionSizeY = Math.max(Math.floor(rs / multiWidth), 1);
-        yield x;
+        yield {
+          u_bytes: this.target,
+          u_width: w,
+          u_blockSizeX: Math.floor(bs % w) > 0 ? Math.floor(bs % w) : w,
+          u_blockSizeY: Math.max(Math.floor(bs / w), 1),
+          u_regionSizeX: Math.floor(rs % w) > 0 ? Math.floor(rs % w) : w,
+          u_regionSizeY: Math.max(Math.floor(rs / w), 1)
+        };
       }
     }
   }
 
-  *generateUntransformerUniforms(): IterableIterator<bitonicUntransformerUniforms> {
-    const params = getParameters(this.targets, this.kind);
-    if (!shared.isLittleEndian || params.mode !== TRANSFORM_MODE.PASSTHROUGH) {
-      const singleWidth = this.targets[0].width;
-      for (let target of this.targets) {
-        yield {
-          u_bytes: target,
-          u_width: singleWidth,
-          u_mode: params.mode,
-          u_endianness: shared.isLittleEndian ? 0 : 1
-        };
-      }
+  private *generateUntransformerUniforms(): IterableIterator<bitonicUntransformerUniforms> {
+    if (!isLittleEndian || this.parameters.mode !== TRANSFORM_MODE.PASSTHROUGH) {
+      yield {
+        u_bytes: this.target,
+        u_width: this.target.width,
+        u_mode: this.parameters.mode,
+        u_endianness: isLittleEndian ? 0 : 1
+      };
     }
   }
 }
@@ -84,14 +78,7 @@ export interface bitonicTransformerUniforms extends Uniforms {
 }
 
 export interface bitonicSorterUniforms extends Uniforms {
-  u_firstBytes: gpu.RenderTarget;
-  u_secondBytes: gpu.RenderTarget;
-  u_thirdBytes: gpu.RenderTarget;
-  u_fourthBytes: gpu.RenderTarget;
-  u_fifthBytes: gpu.RenderTarget;
-  u_sixthBytes: gpu.RenderTarget;
-  u_seventhBytes: gpu.RenderTarget;
-  u_eighthBytes: gpu.RenderTarget;
+  u_bytes: gpu.RenderTarget;
   u_width: number;
   u_blockSizeX: number;
   u_blockSizeY: number;
@@ -104,4 +91,9 @@ export interface bitonicUntransformerUniforms extends Uniforms {
   u_width: number;
   u_mode: number;
   u_endianness: number;
+}
+
+export interface bitonicShaderAndUniforms {
+  shader: gpu.ComputeShader;
+  uniforms: bitonicTransformerUniforms | bitonicSorterUniforms | bitonicUntransformerUniforms;
 }
