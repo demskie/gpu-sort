@@ -7,11 +7,13 @@
     "@types/node": "12.7.4",
     "@types/react": "16.9.2",
     "@types/react-dom": "16.9.0",
+    "@types/stats.js": "^0.17.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-loading": "^2.0.3",
     "react-scripts": "3.1.1",
     "serve": "^11.1.0",
+    "stats.js": "^0.17.0",
     "typescript": "3.6.2"
   },
   "scripts": {

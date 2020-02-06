@@ -1,5 +1,6 @@
 import React from "react";
 import ReactLoading from "react-loading";
+import { default as Stats } from "stats.js";
 
 const startBenchmarking = (window as any).gpuSortGenerate.default.startBenchmarking as () => void;
 const getBenchmarkText = (window as any).gpuSortGenerate.default.getBenchmarkText as () => string;
@@ -14,6 +15,15 @@ export default class App extends React.Component<{}, AppState> {
   state = { output: getBenchmarkText() } as AppState;
 
   componentDidMount = () => {
+    const stats = new Stats();
+    stats.showPanel(0);
+    document.body.appendChild(stats.dom);
+    const animate = () => {
+      stats.begin();
+      stats.end();
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
     setInterval(() => this.setState({ output: getBenchmarkText(), benchmarking: isBenchmarking() }), 100);
   };
 
