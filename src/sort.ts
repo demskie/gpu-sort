@@ -8,30 +8,47 @@ limiter.syncronizer = (fn: () => void) => {
   gpu.waitForSyncWithCallback(() => fn());
 };
 
-export function bitonicSort(array: index.SortableTypedArrays, kind: string, async: boolean): Promise<void> {
-  return new Promise(async function(resolve) {
+export function bitonicSort(array: index.SortableTypedArrays, kind: string) {
+  const bytes = new Uint8Array(array.buffer);
+  const target = getRenderTarget(bytes);
+  const emptyTexelCount = target.width * target.width - bytes.length / 4;
+  const uniformGenerator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
+  target.pushTextureData(bytes);
+  for (let obj of uniformGenerator.generateShaderAndUniforms()) {
+    target.compute(obj.shader, obj.uniforms);
+  }
+  pullPixels(target, emptyTexelCount, bytes);
+  target.delete();
+}
+
+export function bitonicSortAsync(array: index.SortableTypedArrays, kind: string): Promise<void> {
+  return new Promise((resolve, reject) => {
     const bytes = new Uint8Array(array.buffer);
     const target = getRenderTarget(bytes);
     const emptyTexelCount = target.width * target.width - bytes.length / 4;
     const uniformGenerator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
-    for (let obj of uniformGenerator.generateShaderAndUniforms()) {
-      if (async) {
-        limiter.addWork(() => target.compute(obj.shader, obj.uniforms));
-      } else {
-        target.compute(obj.shader, obj.uniforms);
-      }
-    }
-    limiter.onceFinished(() => {
-      if (!async) {
-        pullPixels(target, emptyTexelCount, bytes);
+    target
+      .pushTextureDataAsync(bytes)
+      .then(() => {
+        for (let obj of uniformGenerator.generateShaderAndUniforms()) {
+          limiter.addWork(() => target.compute(obj.shader, obj.uniforms));
+        }
+        limiter.onceFinished(() => {
+          pullPixelsAsync(target, emptyTexelCount, bytes)
+            .then(() => {
+              target.delete();
+              resolve();
+            })
+            .catch(err => {
+              target.delete();
+              reject(err);
+            });
+        });
+      })
+      .catch(err => {
         target.delete();
-        return resolve();
-      }
-      pullPixelsAsync(target, emptyTexelCount, bytes).then(() => {
-        target.delete();
-        resolve();
+        reject(err);
       });
-    });
   });
 }
 
@@ -40,9 +57,7 @@ function getRenderTarget(bytes: Uint8Array) {
   const framebufferLimit = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
   for (let width = 1; width <= framebufferLimit; width *= 2) {
     if (width * width * 4 >= bytes.length) {
-      const renderTarget = new gpu.RenderTarget(width);
-      renderTarget.pushTextureData(bytes);
-      return renderTarget;
+      return new gpu.RenderTarget(width);
     }
   }
   throw new Error(`data overflows ${framebufferLimit}x${framebufferLimit} framebuffer`);

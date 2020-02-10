@@ -6,11 +6,24 @@ let benchmarking = false;
 const widths = [256, 512, 1024, 2048, 4096];
 const results = new Array(widths.length * 2).fill("pending");
 
-async function gpuFloat64Array(width: number) {
-  const slice = new Float64Array(Array.from(Array((width * width) / 2), () => Math.random() - 0.5));
-  let start = performance.now();
-  await index.sortFloat64ArrayAsync(slice);
-  return performance.now() - start;
+function insertRandomNumbers(i: number, array: Float64Array, callback: () => void) {
+  for (let j = 0; j < 1e5; j++) {
+    array[i++] = Math.random() - 0.5;
+  }
+  if (i >= array.length) return callback();
+  requestAnimationFrame(() => insertRandomNumbers(i, array, callback));
+}
+
+function gpuFloat64Array(width: number): Promise<number> {
+  return new Promise(resolve => {
+    const array = new Float64Array((width * width) / 2);
+    insertRandomNumbers(0, array, () => {
+      let start = performance.now();
+      index.sortFloat64ArrayAsync(array).then(() => {
+        resolve(performance.now() - start);
+      });
+    });
+  });
 }
 
 function cpuFloat64Array(width: number) {

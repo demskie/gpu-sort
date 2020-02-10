@@ -42,8 +42,10 @@ export class Limiter {
       });
     } else {
       this.syncronizer(() => {
-        this.updateTimeAndFactor();
-        this.executeWork();
+        requestAnimationFrame(() => {
+          this.updateTimeAndFactor();
+          this.executeWork();
+        });
       });
     }
   }
