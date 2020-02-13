@@ -1,25 +1,41 @@
 import * as index from "../index";
 
-index.precompileShaders();
-
-let benchmarking = false;
+var benchmarking = false;
 const widths = [256, 512, 1024, 2048, 4096];
-const results = new Array(widths.length * 2).fill("pending");
+const results = new Array(widths.length * 3).fill("pending");
 
 function insertRandomNumbers(i: number, array: Float64Array, callback: () => void) {
-  for (let j = 0; j < 1e5; j++) {
-    array[i++] = Math.random() - 0.5;
-  }
+  for (let j = 0; j < 1e5; j++) array[i++] = Math.random() - 0.5;
   if (i >= array.length) return callback();
   requestAnimationFrame(() => insertRandomNumbers(i, array, callback));
 }
 
-function gpuFloat64Array(width: number): Promise<number> {
+function checkSorting(array: ArrayLike<number>) {
+  if (false) {
+    for (let i = 0; i < array.length - 1; i++) {
+      if (array[i] > array[i + 1]) {
+        console.error(array);
+        throw new Error(`index:${i} (${array[i]} > ${array[i + 1]})`);
+      }
+    }
+  }
+}
+
+function gpuFloat64Array(width: number) {
+  const array = new Float64Array(Array.from(Array((width * width) / 2), () => Math.random() - 0.5));
+  let start = performance.now();
+  index.sortFloat64Array(array);
+  checkSorting(array);
+  return performance.now() - start;
+}
+
+function gpuFloat64ArrayAsync(width: number): Promise<number> {
   return new Promise(resolve => {
     const array = new Float64Array((width * width) / 2);
     insertRandomNumbers(0, array, () => {
       let start = performance.now();
       index.sortFloat64ArrayAsync(array).then(() => {
+        checkSorting(array);
         resolve(performance.now() - start);
       });
     });
@@ -27,25 +43,46 @@ function gpuFloat64Array(width: number): Promise<number> {
 }
 
 function cpuFloat64Array(width: number) {
-  const slice = new Float64Array(Array.from(Array((width * width) / 2), () => Math.random() - 0.5));
+  const array = new Float64Array(Array.from(Array((width * width) / 2), () => Math.random() - 0.5));
   let start = performance.now();
-  slice.sort((a, b) => a - b);
+  array.sort((a, b) => a - b);
   return performance.now() - start;
+}
+
+async function prebenchWarmup() {
+  index.precompileShaders();
+  gpuFloat64Array(widths[0]);
+  await gpuFloat64ArrayAsync(widths[0]);
+  cpuFloat64Array(widths[0]);
 }
 
 async function startBenchmarking() {
   if (!benchmarking) {
     benchmarking = true;
     results.fill("pending");
-    for (let i = 0; i < widths.length; i++) {
-      const n = await gpuFloat64Array(widths[i]);
-      results[i] = `${n.toLocaleString("en")}ms`;
-      await new Promise(fn => setTimeout(fn, 500));
+    if (true) {
+      await prebenchWarmup();
     }
-    for (let i = 0; i < widths.length; i++) {
-      const n = cpuFloat64Array(widths[i]);
-      results[i + widths.length] = `${n.toLocaleString("en")}ms`;
-      await new Promise(fn => setTimeout(fn, 500));
+    if (true) {
+      for (let i = 0; i < widths.length; i++) {
+        const n = gpuFloat64Array(widths[i]);
+        results[i + 0 * widths.length] = `${n.toLocaleString("en")}ms`;
+        await new Promise(fn => setTimeout(fn, 500));
+      }
+    }
+    if (true) {
+      for (let i = 0; i < widths.length; i++) {
+        const n = await gpuFloat64ArrayAsync(widths[i]);
+        results[i + 1 * widths.length] = `${n.toLocaleString("en")}ms`;
+        await new Promise(fn => setTimeout(fn, 500));
+      }
+    }
+    if (true) {
+      for (let i = 0; i < widths.length; i++) {
+        const n = cpuFloat64Array(widths[i]);
+        results[i + 2 * widths.length] = `${n.toLocaleString("en")}ms`;
+        await new Promise(fn => setTimeout(fn, 500));
+      }
     }
     benchmarking = false;
   }
@@ -53,25 +90,30 @@ async function startBenchmarking() {
 
 function getBenchmarkText() {
   return `
-dimensions:         256 x 256
-gpuFloat64Array     ${results[0]}
-cpuFloat64Array     ${results[5]}
+dimensions:          256 x 256
+gpu.sort             ${results[0]}
+gpu.sortAsync        ${results[5]}
+Float64Array.sort    ${results[10]}
 
-dimensions:         512 x 512
-gpuFloat64Array     ${results[1]}
-cpuFloat64Array     ${results[6]}
+dimensions:          512 x 512
+gpu.sort             ${results[1]}
+gpu.sortAsync        ${results[6]}
+Float64Array.sort    ${results[11]}
 
-dimensions:         1024 x 1024
-gpuFloat64Array     ${results[2]}
-cpuFloat64Array     ${results[7]}
+dimensions:          1024 x 1024
+gpu.sort             ${results[2]}
+gpu.sortAsync        ${results[7]}
+Float64Array.sort    ${results[12]}
 
-dimensions:         2048 x 2048
-gpuFloat64Array     ${results[3]}
-cpuFloat64Array     ${results[8]}
+dimensions:          2048 x 2048
+gpu.sort             ${results[3]}
+gpu.sortAsync        ${results[8]}
+Float64Array.sort    ${results[13]}
 
-dimensions:         4096 x 4096
-gpuFloat64Array     ${results[4]}
-cpuFloat64Array     ${results[9]}
+dimensions:          4096 x 4096
+gpu.sort             ${results[4]}
+gpu.sortAsync        ${results[9]}
+Float64Array.sort    ${results[14]}
 	`.trim();
 }
 

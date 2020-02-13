@@ -16,7 +16,7 @@ export class BitonicUniformGenerator {
     this.emptyTexelCount = emptyTexelCount;
   }
 
-  *generateShaderAndUniforms(): IterableIterator<bitonicShaderAndUniforms> {
+  *generate(): IterableIterator<bitonicShaderAndUniforms> {
     for (let uniforms of this.generateTransformerUniforms())
       yield { shader: this.parameters.transformShader, uniforms: uniforms };
     for (let uniforms of this.generateSorterUniforms())

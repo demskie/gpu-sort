@@ -3,20 +3,13 @@ import * as index from "./index";
 import { Limiter } from "./limiter";
 import { BitonicUniformGenerator } from "./uniforms";
 
-const limiter = new Limiter();
-limiter.syncronizer = (fn: () => void) => {
-  gpu.waitForSyncWithCallback(() => fn());
-};
-
 export function bitonicSort(array: index.SortableTypedArrays, kind: string) {
   const bytes = new Uint8Array(array.buffer);
   const target = getRenderTarget(bytes);
-  const emptyTexelCount = target.width * target.width - bytes.length / 4;
-  const uniformGenerator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
   target.pushTextureData(bytes);
-  for (let obj of uniformGenerator.generateShaderAndUniforms()) {
-    target.compute(obj.shader, obj.uniforms);
-  }
+  const emptyTexelCount = target.width * target.width - bytes.length / 4;
+  const generator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
+  for (let x of generator.generate()) target.compute(x.shader, x.uniforms);
   pullPixels(target, emptyTexelCount, bytes);
   target.delete();
 }
@@ -25,30 +18,21 @@ export function bitonicSortAsync(array: index.SortableTypedArrays, kind: string)
   return new Promise((resolve, reject) => {
     const bytes = new Uint8Array(array.buffer);
     const target = getRenderTarget(bytes);
-    const emptyTexelCount = target.width * target.width - bytes.length / 4;
-    const uniformGenerator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
     target
       .pushTextureDataAsync(bytes)
       .then(() => {
-        for (let obj of uniformGenerator.generateShaderAndUniforms()) {
-          limiter.addWork(() => target.compute(obj.shader, obj.uniforms));
-        }
+        const limiter = new Limiter(target.width);
+        const emptyTexelCount = target.width * target.width - bytes.length / 4;
+        const generator = new BitonicUniformGenerator(target, kind, emptyTexelCount);
+        for (let x of generator.generate()) limiter.addWork(() => target.compute(x.shader, x.uniforms));
         limiter.onceFinished(() => {
           pullPixelsAsync(target, emptyTexelCount, bytes)
-            .then(() => {
-              target.delete();
-              resolve();
-            })
-            .catch(err => {
-              target.delete();
-              reject(err);
-            });
+            .then(() => resolve())
+            .catch(err => reject(err))
+            .finally(() => (target.delete(), limiter.stop()));
         });
       })
-      .catch(err => {
-        target.delete();
-        reject(err);
-      });
+      .catch(err => (reject(err), target.delete()));
   });
 }
 
@@ -82,5 +66,21 @@ async function pullPixelsAsync(target: gpu.RenderTarget, e: number, bytes: Uint8
     return target.readSomePixelsAsync(0, h + 1, w, w - h - 1, bytes.subarray(4 * (w - (e % w))));
   } else {
     return target.readSomePixelsAsync(0, h, w, w - h, bytes);
+  }
+}
+
+export function sortUint8Array(array: Uint8Array) {
+  const count = new Array(256).fill(0);
+  for (let v of array) count[v]++;
+  for (let i = 0, n = 0; i < array.length; n++) {
+    array.fill(n, i, (i += count[n]));
+  }
+}
+
+export function sortUint16Array(array: Int8Array) {
+  const count = new Array(65536).fill(0);
+  for (let v of array) count[v]++;
+  for (let i = 0, n = 0; i < array.length; n++) {
+    array.fill(n, i, (i += count[n]));
   }
 }
