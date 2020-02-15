@@ -46,9 +46,4 @@ setWebGLContext(require("gl")(1, 1));
 
 ## https://demskie.github.io
 
-```
-                iPhone8                             OnePlus7Pro
-```
-
-<img src="iphone8.jpeg" width="340"/>
-<img src="oneplus7pro.jpeg" width="340"/>
+<img src="example.png" />
