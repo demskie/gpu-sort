@@ -1,6 +1,6 @@
 # gpu-sort
 
-## GPU accelerated asynchronous sorter
+## GPU accelerated asynchronous sorting
 
 [![Build Status](https://travis-ci.org/demskie/gpu-sort.svg?branch=master)](https://travis-ci.org/demskie/gpu-sort) [![Coverage Status](https://coveralls.io/repos/github/demskie/gpu-sort/badge.svg?branch=master)](https://coveralls.io/github/demskie/gpu-sort?branch=master)
 [![Dependency Status](https://david-dm.org/demskie/gpu-sort/status.svg)](https://david-dm.org/demskie/gpu-sort#info=dependencies&view=table)
@@ -22,24 +22,25 @@ npm install gpu-sort
 ```js
 import * as gpu from "gpu-sort";
 
-const foo = new Float64Array([42, 16, -3, 1]);
+let numbers = new Float64Array([5, 4, 3, 2, 1, 0]);
 
 // sort in place
-gpu.sort(foo);
+gpu.sort(numbers);
 
 // sort in place asynchronously
-gpu.sortAsync(foo).then(() => {
-  console.log(foo);
-});
+gpu.sortAsync(numbers).then(() => console.log("sorted!"));
 ```
 
 ## NodeJS support
 
 ```js
-// since Node does not natively support WebGL a third-party emulation library must be manually specified
+import * as gpu from "gpu-sort";
 
-import { setWebGLContext } from "gpu-sort";
-setWebGLContext(require("gl")(1, 1));
+// For NodeJS an emulation library must be provided as it doesn't support WebGL
+gpu.setWebGLContext(require("gl")(1, 1));
+
+// sort using webgl emulated context
+gpu.sort(foo);
 ```
 
 ## Benchmarks
@@ -47,3 +48,9 @@ setWebGLContext(require("gl")(1, 1));
 ## https://demskie.github.io
 
 <img src="example.png" />
+
+## Limitations
+
+1. Only TypedArrays are supported.
+2. When sorting 8bit and 16bit numbers GPU acceleration is disabled (as it seems rather pointless).
+3. The maximum number of elements that can be sorted is constrained by the max texture width squared. For example `4096 ^ 2 = 16,777,216 (32bit)` or `4096 ^ 2 / 2 = 8,388,608 (64bit)`. This can be increased in the future by up to 8 times by multiplexing the data across multiple framebuffers.

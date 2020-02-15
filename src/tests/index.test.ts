@@ -4,6 +4,46 @@ beforeAll(() => {
   index.setWebGLContext(require("gl")(1, 1));
 });
 
+test("testArray", () => {
+  let n = 123 * 456;
+  let alpha = Array.from(Array(n), () => (Math.random() - 0.5) * 256);
+  try {
+    index.sort(alpha as any);
+  } catch (err) {
+    if (err.toString() !== "Error: [object Array] is unsupported") {
+      throw new Error("something unexpected happened");
+    }
+  }
+});
+
+test("testArrayAsync", async function() {
+  let n = 123 * 456;
+  let alpha = Array.from(Array(n), () => (Math.random() - 0.5) * 256);
+  try {
+    await index.sortAsync(alpha as any);
+  } catch (err) {
+    if (err.toString() !== "Error: [object Array] is unsupported") {
+      throw new Error("something unexpected happened");
+    }
+  }
+});
+
+test("testInt8Empty", () => {
+  let n = 0;
+  let alpha = new Int8Array(Array.from(Array(n), () => (Math.random() - 0.5) * 256));
+  let bravo = Int8Array.from(alpha).sort((a, b) => a - b);
+  index.sort(alpha);
+  if (alpha.toString() !== bravo.toString()) throw new Error("did not sort properly");
+});
+
+test("testInt8EmptyAsync", async function() {
+  let n = 0;
+  let alpha = new Int8Array(Array.from(Array(n), () => (Math.random() - 0.5) * 256));
+  let bravo = Int8Array.from(alpha).sort((a, b) => a - b);
+  await index.sortAsync(alpha);
+  if (alpha.toString() !== bravo.toString()) throw new Error("did not sort properly");
+});
+
 test("testInt8", () => {
   let n = 123 * 456;
   let alpha = new Int8Array(Array.from(Array(n), () => (Math.random() - 0.5) * 256));
@@ -16,7 +56,9 @@ test("testInt8Async", async function() {
   let n = 123 * 456;
   let alpha = new Int8Array(Array.from(Array(n), () => (Math.random() - 0.5) * 256));
   let bravo = Int8Array.from(alpha).sort((a, b) => a - b);
-  await index.sortAsync(alpha);
+  await index.sortAsync(alpha).catch(err => {
+    throw new Error(err);
+  });
   if (alpha.toString() !== bravo.toString()) throw new Error("did not sort properly");
 });
 

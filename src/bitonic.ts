@@ -42,7 +42,7 @@ export function bitonicSortAsync(
   });
 }
 
-function getRenderTarget(bytes: Uint8Array) {
+export function getRenderTarget(bytes: Uint8Array) {
   const gl = gpu.getWebGLContext();
   const framebufferLimit = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
   for (let width = 1; width <= framebufferLimit; width *= 2) {
@@ -53,7 +53,7 @@ function getRenderTarget(bytes: Uint8Array) {
   throw new Error(`data overflows ${framebufferLimit}x${framebufferLimit} framebuffer`);
 }
 
-function pullPixels(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
+export function pullPixels(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
   const w = target.width;
   const h = Math.floor(e / w);
   if (e % w > 0) {
@@ -64,7 +64,7 @@ function pullPixels(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
   }
 }
 
-async function pullPixelsAsync(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
+export async function pullPixelsAsync(target: gpu.RenderTarget, e: number, bytes: Uint8Array) {
   const w = target.width;
   const h = Math.floor(e / w);
   if (e % w > 0) {
