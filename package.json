@@ -15,9 +15,6 @@
     "type": "git",
     "url": "git+https://github.com/demskie/gpu-sort.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "files": [
     "lib/**/*"
   ],
