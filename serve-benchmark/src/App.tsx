@@ -7,9 +7,9 @@ import { getWebGLContext } from "gpu-compute";
 const parser = new UAParser();
 var result = parser.getResult();
 
-const startBenchmarking = (window as any).gpuSortGenerate.default.startBenchmarking as () => void;
-const getBenchmarkText = (window as any).gpuSortGenerate.default.getBenchmarkText as () => string;
-const isBenchmarking = (window as any).gpuSortGenerate.default.isBenchmarking as () => boolean;
+const startBenchmarking = (window as any).gpuSortGenerate.startBenchmarking as () => void;
+const getBenchmarkText = (window as any).gpuSortGenerate.getBenchmarkText as () => string;
+const isBenchmarking = (window as any).gpuSortGenerate.isBenchmarking as () => boolean;
 
 interface AppState {
   output: string;
@@ -42,7 +42,7 @@ export default class App extends React.Component<{}, AppState> {
   render() {
     return (
       <div style={{ textAlign: "center" }}>
-        <header
+        <div
           style={{
             backgroundColor: "#282c34",
             minHeight: "100vh",
@@ -76,12 +76,10 @@ export default class App extends React.Component<{}, AppState> {
               return <ReactLoading type={"cylon"} color={"white"} height={70} width={70} />;
             }
           })()}
-          <div style={{ fontFamily: "monospace", paddingBottom: "20px" }}>
-            {`
-            ${result.browser.name} ${result.browser.major}, 
-            ${result.os.name} ${result.os.version}, 
-            ${this.getWebGLRenderer()}
-            `}
+          <div style={{ fontFamily: "monospace" }}>
+            {`${result.browser.name} ${result.browser.major}, ` +
+              `${result.os.name} ${result.os.version}, ` +
+              `${this.getWebGLRenderer()}`}
           </div>
           <div
             style={{
@@ -93,7 +91,7 @@ export default class App extends React.Component<{}, AppState> {
           >
             {this.state.output}
           </div>
-        </header>
+        </div>
       </div>
     );
   }

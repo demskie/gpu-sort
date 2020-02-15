@@ -4,6 +4,10 @@ var benchmarking = false;
 const widths = [256, 512, 1024, 2048, 4096];
 const results = new Array(widths.length * 3).fill("pending");
 
+export function isBenchmarking() {
+  return benchmarking;
+}
+
 function insertRandomNumbers(i: number, array: Float64Array, callback: () => void) {
   for (let j = 0; j < 1e5; j++) array[i++] = Math.random() - 0.5;
   if (i >= array.length) return callback();
@@ -56,7 +60,13 @@ async function prebenchWarmup() {
   cpuFloat64Array(widths[0]);
 }
 
-async function startBenchmarking() {
+function integerWithCommas(x: number) {
+  return Math.round(x)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export async function startBenchmarking() {
   if (!benchmarking) {
     benchmarking = true;
     results.fill("pending");
@@ -66,21 +76,21 @@ async function startBenchmarking() {
     if (true) {
       for (let i = 0; i < widths.length; i++) {
         const n = gpuFloat64Array(widths[i]);
-        results[i + 0 * widths.length] = `${n.toLocaleString("en")}ms`;
+        results[i + 0 * widths.length] = `${integerWithCommas(n)}ms`;
         await new Promise(fn => setTimeout(fn, 500));
       }
     }
     if (true) {
       for (let i = 0; i < widths.length; i++) {
         const n = await gpuFloat64ArrayAsync(widths[i]);
-        results[i + 1 * widths.length] = `${n.toLocaleString("en")}ms`;
+        results[i + 1 * widths.length] = `${integerWithCommas(n)}ms`;
         await new Promise(fn => setTimeout(fn, 500));
       }
     }
     if (true) {
       for (let i = 0; i < widths.length; i++) {
         const n = cpuFloat64Array(widths[i]);
-        results[i + 2 * widths.length] = `${n.toLocaleString("en")}ms`;
+        results[i + 2 * widths.length] = `${integerWithCommas(n)}ms`;
         await new Promise(fn => setTimeout(fn, 500));
       }
     }
@@ -88,32 +98,32 @@ async function startBenchmarking() {
   }
 }
 
-function getBenchmarkText() {
-  return `
-dimensions:          256 x 256
-gpu.sort             ${results[0]}
-gpu.sortAsync        ${results[5]}
-Float64Array.sort    ${results[10]}
+export function getBenchmarkText() {
+  return `‎‎‎
+           32,768
+gpu.sort            ${results[0]}
+gpu.sortAsync       ${results[5]}
+Float64Array.sort   ${results[10]}
 
-dimensions:          512 x 512
-gpu.sort             ${results[1]}
-gpu.sortAsync        ${results[6]}
-Float64Array.sort    ${results[11]}
+           131,072
+gpu.sort            ${results[1]}
+gpu.sortAsync       ${results[6]}
+Float64Array.sort   ${results[11]}
 
-dimensions:          1024 x 1024
-gpu.sort             ${results[2]}
-gpu.sortAsync        ${results[7]}
-Float64Array.sort    ${results[12]}
+           524,288
+gpu.sort            ${results[2]}
+gpu.sortAsync       ${results[7]}
+Float64Array.sort   ${results[12]}
 
-dimensions:          2048 x 2048
-gpu.sort             ${results[3]}
-gpu.sortAsync        ${results[8]}
-Float64Array.sort    ${results[13]}
+          2,097,152
+gpu.sort            ${results[3]}
+gpu.sortAsync       ${results[8]}
+Float64Array.sort   ${results[13]}
 
-dimensions:          4096 x 4096
-gpu.sort             ${results[4]}
-gpu.sortAsync        ${results[9]}
-Float64Array.sort    ${results[14]}
+          8,388,608
+gpu.sort            ${results[4]}
+gpu.sortAsync       ${results[9]}
+Float64Array.sort   ${results[14]}
 	`.trim();
 }
 

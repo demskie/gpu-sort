@@ -98,6 +98,7 @@
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "babel-loader": "^8.0.4",
+    "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-static-fs": "^3.0.0",
     "babel-runtime": "^6.26.0",
     "benchmark": "^2.1.4",
