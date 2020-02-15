@@ -1,6 +1,11 @@
 import React from "react";
 import ReactLoading from "react-loading";
 import { default as Stats } from "stats.js";
+import { UAParser } from "ua-parser-js";
+import { getWebGLContext } from "gpu-compute";
+
+const parser = new UAParser();
+var result = parser.getResult();
 
 const startBenchmarking = (window as any).gpuSortGenerate.default.startBenchmarking as () => void;
 const getBenchmarkText = (window as any).gpuSortGenerate.default.getBenchmarkText as () => string;
@@ -26,6 +31,13 @@ export default class App extends React.Component<{}, AppState> {
     requestAnimationFrame(animate);
     setInterval(() => this.setState({ output: getBenchmarkText(), benchmarking: isBenchmarking() }), 100);
   };
+
+  getWebGLRenderer() {
+    const gl = getWebGLContext();
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    if (!debugInfo) return `${debugInfo}`;
+    return `${gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)}`;
+  }
 
   render() {
     return (
@@ -64,13 +76,19 @@ export default class App extends React.Component<{}, AppState> {
               return <ReactLoading type={"cylon"} color={"white"} height={70} width={70} />;
             }
           })()}
+          <div style={{ fontFamily: "monospace", paddingBottom: "20px" }}>
+            {`
+            ${result.browser.name} ${result.browser.major}, 
+            ${result.os.name} ${result.os.version}, 
+            ${this.getWebGLRenderer()}
+            `}
+          </div>
           <div
             style={{
-              width: "380px",
               textAlign: "left",
               whiteSpace: "pre-wrap",
               fontFamily: "monospace",
-              paddingBottom: "60px"
+              paddingBottom: "30px"
             }}
           >
             {this.state.output}

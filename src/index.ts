@@ -1,80 +1,109 @@
-import * as init from "./initialize";
-import { bitonicSort, bitonicSortAsync } from "./sort";
+import { bitonicSort, bitonicSortAsync } from "./bitonic";
+import { radixSortAsync, radixSortSignedAsync } from "./radix";
 
 export { setWebGLContext } from "gpu-compute";
+export { initializeShaders } from "./initialize";
 
-export function sortInt32Array(array: Int32Array) {
-  if (checkConstructor(array, "Int32Array")) return bitonicSort(array, "Int32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Int32Array`);
+export function sort(
+  array:
+    | Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array
+    | BigInt64Array
+    | BigUint64Array
+) {
+  if (!array.length) return array;
+  switch (Object.prototype.toString.call(array)) {
+    case "[object Int8Array]":
+    case "[object Uint8Array]":
+    case "[object Uint8ClampedArray]":
+    case "[object Int16Array]":
+    case "[object Uint16Array]":
+      return (array as any).sort((a: number, b: number) => a - b);
+    case "[object Int32Array]":
+      return bitonicSort(array as Int32Array, "Int32Array");
+    case "[object Uint32Array]":
+      return bitonicSort(array as Uint32Array, "Uint32Array");
+    case "[object Float32Array]":
+      return bitonicSort(array as Float32Array, "Float32Array");
+    case "[object Float64Array]":
+      return bitonicSort(array as Float64Array, "Float64Array");
+    case "[object BigInt64Array]":
+      return bitonicSort(array as BigInt64Array, "BigInt64Array");
+    case "[object BigUint64Array]":
+      return bitonicSort(array as BigUint64Array, "BigUint64Array");
+  }
+  throw new Error(`${Object.prototype.toString.call(array)} is unsupported`);
 }
 
-export function sortInt32ArrayAsync(array: Int32Array) {
-  if (checkConstructor(array, "Int32Array")) return bitonicSortAsync(array, "Int32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Int32Array`);
+export function sortAsync(
+  array:
+    | Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array
+    | BigInt64Array
+    | BigUint64Array
+) {
+  return new Promise((resolve, reject) => {
+    if (!array.length) return resolve();
+    switch (Object.prototype.toString.call(array)) {
+      case "[object Int8Array]":
+        return radixSortSignedAsync(new Uint8Array((array as Int8Array).buffer), 256)
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Uint8Array]":
+        return radixSortAsync(new Uint8Array((array as Uint8Array).buffer), 256)
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Uint8ClampedArray]":
+        return radixSortAsync(new Uint8Array((array as Uint8ClampedArray).buffer), 256)
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Int16Array]":
+        return radixSortSignedAsync(new Uint16Array((array as Int16Array).buffer), 65536)
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Uint16Array]":
+        return radixSortAsync(array as Uint16Array, 65536)
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Int32Array]":
+        return bitonicSortAsync(array as Int32Array, "Int32Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Uint32Array]":
+        return bitonicSortAsync(array as Uint32Array, "Uint32Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Float32Array]":
+        return bitonicSortAsync(array as Float32Array, "Float32Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object Float64Array]":
+        return bitonicSortAsync(array as Float64Array, "Float64Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object BigInt64Array]":
+        return bitonicSortAsync(array as BigInt64Array, "BigInt64Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+      case "[object BigUint64Array]":
+        return bitonicSortAsync(array as BigUint64Array, "BigUint64Array")
+          .then(() => resolve())
+          .catch(err => reject(err));
+    }
+    reject(new Error(`${Object.prototype.toString.call(array)} is unsupported`));
+  });
 }
-
-export function sortUint32Array(array: Uint32Array) {
-  if (checkConstructor(array, "Uint32Array")) return bitonicSort(array, "Uint32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Uint32Array`);
-}
-
-export function sortUint32ArrayAsync(array: Uint32Array) {
-  if (checkConstructor(array, "Uint32Array")) return bitonicSortAsync(array, "Uint32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Uint32Array`);
-}
-
-export function sortFloat32Array(array: Float32Array) {
-  if (checkConstructor(array, "Float32Array")) return bitonicSort(array, "Float32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Float32Array`);
-}
-
-export function sortFloat32ArrayAsync(array: Float32Array) {
-  if (checkConstructor(array, "Float32Array")) return bitonicSortAsync(array, "Float32Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Float32Array`);
-}
-
-export function sortFloat64Array(array: Float64Array) {
-  if (checkConstructor(array, "Float64Array")) return bitonicSort(array, "Float64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Float64Array`);
-}
-
-export function sortFloat64ArrayAsync(array: Float64Array) {
-  if (checkConstructor(array, "Float64Array")) return bitonicSortAsync(array, "Float64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a Float64Array`);
-}
-
-export function sortBigInt64Array(array: BigInt64Array) {
-  if (checkConstructor(array, "BigInt64Array")) return bitonicSort(array, "BigInt64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a BigInt64Array`);
-}
-
-export function sortBigInt64ArrayAsync(array: BigInt64Array) {
-  if (checkConstructor(array, "BigInt64Array")) return bitonicSortAsync(array, "BigInt64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a BigInt64Array`);
-}
-
-export function sortBigUint64Array(array: BigUint64Array) {
-  if (checkConstructor(array, "BigUint64Array")) return bitonicSort(array, "BigUint64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a BigUint64Array`);
-}
-
-export function sortBigUint64ArrayAsync(array: BigUint64Array) {
-  if (checkConstructor(array, "BigUint64Array")) return bitonicSortAsync(array, "BigUint64Array");
-  throw new Error(`array parameter of '${array.constructor.name}' was not a BigUint64Array`);
-}
-
-export const precompileShaders = () => init.initializeShaders();
-
-function checkConstructor(array: SortableTypedArrays, expectedType: string) {
-  return Object.prototype.toString.call(array) === `[object ${expectedType}]`;
-}
-
-export type SortableTypedArrays =
-  | Int16Array
-  | Uint16Array
-  | Int32Array
-  | Uint32Array
-  | Float32Array
-  | Float64Array
-  | BigInt64Array
-  | BigUint64Array;

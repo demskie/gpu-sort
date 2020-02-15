@@ -35,7 +35,7 @@
   ],
   "author": "Alex Demskie",
   "license": "MIT",
-  "homepage": "https://github.com/demskie/gpu-sort#readme",
+  "homepage": "https://demskie.github.io",
   "bugs": {
     "url": "https://github.com/demskie/gpu-sort/issues"
   },
@@ -122,6 +122,6 @@
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
-    "gpu-compute": "^0.1.4"
+    "gpu-compute": "^0.1.5"
   }
 }

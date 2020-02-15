@@ -24,7 +24,7 @@ function checkSorting(array: ArrayLike<number>) {
 function gpuFloat64Array(width: number) {
   const array = new Float64Array(Array.from(Array((width * width) / 2), () => Math.random() - 0.5));
   let start = performance.now();
-  index.sortFloat64Array(array);
+  index.sort(array);
   checkSorting(array);
   return performance.now() - start;
 }
@@ -34,7 +34,7 @@ function gpuFloat64ArrayAsync(width: number): Promise<number> {
     const array = new Float64Array((width * width) / 2);
     insertRandomNumbers(0, array, () => {
       let start = performance.now();
-      index.sortFloat64ArrayAsync(array).then(() => {
+      index.sortAsync(array).then(() => {
         checkSorting(array);
         resolve(performance.now() - start);
       });
@@ -50,7 +50,7 @@ function cpuFloat64Array(width: number) {
 }
 
 async function prebenchWarmup() {
-  index.precompileShaders();
+  index.initializeShaders();
   gpuFloat64Array(widths[0]);
   await gpuFloat64ArrayAsync(widths[0]);
   cpuFloat64Array(widths[0]);

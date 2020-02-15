@@ -1,9 +1,11 @@
 import * as gpu from "gpu-compute";
-import * as index from "./index";
 import { Limiter } from "./limiter";
 import { BitonicUniformGenerator } from "./uniforms";
 
-export function bitonicSort(array: index.SortableTypedArrays, kind: string) {
+export function bitonicSort(
+  array: Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array,
+  kind: "Int32Array" | "Uint32Array" | "Float32Array" | "Float64Array" | "BigInt64Array" | "BigUint64Array"
+) {
   const bytes = new Uint8Array(array.buffer);
   const target = getRenderTarget(bytes);
   target.pushTextureData(bytes);
@@ -12,9 +14,13 @@ export function bitonicSort(array: index.SortableTypedArrays, kind: string) {
   for (let x of generator.generate()) target.compute(x.shader, x.uniforms);
   pullPixels(target, emptyTexelCount, bytes);
   target.delete();
+  return array;
 }
 
-export function bitonicSortAsync(array: index.SortableTypedArrays, kind: string): Promise<void> {
+export function bitonicSortAsync(
+  array: Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array,
+  kind: "Int32Array" | "Uint32Array" | "Float32Array" | "Float64Array" | "BigInt64Array" | "BigUint64Array"
+): Promise<void> {
   return new Promise((resolve, reject) => {
     const bytes = new Uint8Array(array.buffer);
     const target = getRenderTarget(bytes);
@@ -66,21 +72,5 @@ async function pullPixelsAsync(target: gpu.RenderTarget, e: number, bytes: Uint8
     return target.readSomePixelsAsync(0, h + 1, w, w - h - 1, bytes.subarray(4 * (w - (e % w))));
   } else {
     return target.readSomePixelsAsync(0, h, w, w - h, bytes);
-  }
-}
-
-export function sortUint8Array(array: Uint8Array) {
-  const count = new Array(256).fill(0);
-  for (let v of array) count[v]++;
-  for (let i = 0, n = 0; i < array.length; n++) {
-    array.fill(n, i, (i += count[n]));
-  }
-}
-
-export function sortUint16Array(array: Int8Array) {
-  const count = new Array(65536).fill(0);
-  for (let v of array) count[v]++;
-  for (let i = 0, n = 0; i < array.length; n++) {
-    array.fill(n, i, (i += count[n]));
   }
 }
