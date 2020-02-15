@@ -1,7 +1,7 @@
 {
   "name": "gpu-sort",
   "version": "0.0.1",
-  "description": "gpu accelerated stable sort",
+  "description": "gpu accelerated asynchronous sorting",
   "main": "lib/index.js",
   "scripts": {
     "test": "tsc --noEmit && jest --runInBand",
@@ -15,10 +15,11 @@
     "type": "git",
     "url": "git+https://github.com/demskie/gpu-sort.git"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "files": [
-    "lib/**/*",
-    "bench/**/*",
-    "test/**/*"
+    "lib/**/*"
   ],
   "keywords": [
     "sort",
@@ -35,7 +36,7 @@
   ],
   "author": "Alex Demskie",
   "license": "MIT",
-  "homepage": "https://demskie.github.io",
+  "homepage": "https://demskie.github.io/gpu-sort",
   "bugs": {
     "url": "https://github.com/demskie/gpu-sort/issues"
   },
@@ -75,9 +76,6 @@
     "collectCoverage": false,
     "collectCoverageFrom": [
       "!**/tests/**",
-      "!**/benchmarks/**",
-      "!**/*.bench.ts",
-      "!**/*.mock.ts",
       "!**/node_modules/**",
       "!**/vendor/**",
       "**/*.ts"
