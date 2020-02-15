@@ -122,6 +122,6 @@
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
-    "gpu-compute": "^0.1.5"
+    "gpu-compute": "^0.1.7"
   }
 }
