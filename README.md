@@ -42,6 +42,13 @@ import { setWebGLContext } from "gpu-sort";
 setWebGLContext(require("gl")(1, 1));
 ```
 
-## Browser Benchmarks
+## Benchmarks
 
-![iphone8](iphone8.jpeg "iphone8") ![oneplus7pro](oneplus7pro.jpeg "oneplus7pro")
+## https://demskie.github.io
+
+```
+                iPhone8                               OnePlus7Pro
+```
+
+<img src="iphone8.jpeg" width="355"/>
+<img src="oneplus7pro.jpeg" width="355"/>
