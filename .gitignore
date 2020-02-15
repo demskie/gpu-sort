@@ -4,5 +4,5 @@ node_modules
 /dist
 /bench
 /test
-*.bundle.js
+serve-benchmark/public/generate.bundle.js
 .DS_Store
