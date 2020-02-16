@@ -3,7 +3,7 @@
 ## GPU accelerated asynchronous sorting
 
 [![Build Status](https://travis-ci.org/demskie/gpu-sort.svg?branch=master)](https://travis-ci.org/demskie/gpu-sort) [![Coverage Status](https://coveralls.io/repos/github/demskie/gpu-sort/badge.svg?branch=master)](https://coveralls.io/github/demskie/gpu-sort?branch=master)
-[![Dependency Status](https://david-dm.org/demskie/gpu-sort/status.svg)](https://david-dm.org/demskie/gpu-sort#info=dependencies&view=table)
+[![Dependency Status](https://david-dm.org/demskie/gpu-sort/status.svg)](https://david-dm.org/demskie/gpu-sort#info=dependencies&view=table)[![npm version](https://badge.fury.io/js/gpu-sort.svg)](https://badge.fury.io/js/gpu-sort)
 
 ## Why?
 
