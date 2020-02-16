@@ -45,7 +45,7 @@ gpu.sort(foo);
 
 ## Benchmarks
 
-## https://demskie.github.io
+## https://demskie.github.io/gpu-sort
 
 <img src="example.png" />
 
