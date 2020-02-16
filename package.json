@@ -1,7 +1,7 @@
 {
   "name": "gpu-sort",
   "version": "1.0.0",
-  "description": "gpu accelerated asynchronous sorting",
+  "description": "GPU accelerated asynchronous sorting",
   "main": "lib/index.js",
   "scripts": {
     "test": "tsc --noEmit && jest --runInBand --coverage",
@@ -65,14 +65,10 @@
     "testPathIgnorePatterns": [
       "<rootDir>/node_modules/",
       "<rootDir>/config/",
-      "<rootDir>/build/",
-      "<rootDir>/src/mockdata/",
-      "<rootDir>/src/benchmarks/"
+      "<rootDir>/build/"
     ],
     "collectCoverage": false,
     "collectCoverageFrom": [
-      "!**/tests/**",
-      "!**/benchmarks/**",
       "!**/node_modules/**",
       "!**/vendor/**",
       "**/*.ts"
@@ -86,7 +82,6 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-typescript": "^7.8.3",
-    "@babel/runtime-corejs3": "^7.8.4",
     "@types/jest": "^25.1.2",
     "@types/node": "^13.7.1",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
@@ -99,11 +94,7 @@
     "cpy-cli": "^3.1.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
     "gh-pages": "^2.2.0",
     "gl": "^4.4.1",
     "jest": "^25.1.0",
