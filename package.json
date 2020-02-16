@@ -4,7 +4,7 @@
   "description": "gpu accelerated asynchronous sorting",
   "main": "lib/index.js",
   "scripts": {
-    "test": "tsc --noEmit && jest --runInBand",
+    "test": "tsc --noEmit && jest --runInBand --coverage",
     "build": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/ && tsc && jest --runInBand --coverage",
     "bundle": "webpack --progress --config-name dist",
     "bench-browser": "webpack --progress --config-name bench-generate && npm run debug --prefix serve-benchmark",
