@@ -5,11 +5,10 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "tsc --noEmit && jest --runInBand",
-    "prebuild": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/",
-    "build": "tsc && jest --runInBand --coverage",
+    "build": "trash lib && make-dir lib/shaders && cpy src/shaders/** lib/shaders/ && tsc && jest --runInBand --coverage",
     "bundle": "webpack --progress --config-name dist",
-    "prebench-browser": "webpack --progress --config-name bench-generate",
-    "bench-browser": "npm run debug --prefix serve-benchmark"
+    "bench-browser": "webpack --progress --config-name bench-generate && npm run debug --prefix serve-benchmark",
+    "gh-pages-deploy": "webpack --progress --config-name bench-generate && npm run build --prefix serve-benchmark && gh-pages -d serve-benchmark/build"
   },
   "repository": {
     "type": "git",
@@ -106,6 +105,7 @@
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "gh-pages": "^2.2.0",
     "gl": "^4.4.0",
     "jest": "^24.9.0",
     "make-dir-cli": "^2.0.0",
