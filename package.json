@@ -1,6 +1,6 @@
 {
   "name": "gpu-sort",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "gpu accelerated asynchronous sorting",
   "main": "lib/index.js",
   "scripts": {
