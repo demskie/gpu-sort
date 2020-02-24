@@ -17,7 +17,7 @@ function insertRandomNumbers(i: number, array: Float64Array, callback: () => voi
 }
 
 function checkSorting(array: ArrayLike<number>) {
-  if (false) {
+  if (true) {
     for (let i = 0; i < array.length - 1; i++) {
       if (array[i] > array[i + 1]) {
         console.error(array);
