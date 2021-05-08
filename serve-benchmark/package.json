@@ -16,7 +16,7 @@
     "serve": "^11.1.0",
     "stats.js": "^0.17.0",
     "typescript": "3.6.2",
-    "ua-parser-js": "^0.7.21"
+    "ua-parser-js": "^0.7.24"
   },
   "scripts": {
     "debug": "react-scripts start",
