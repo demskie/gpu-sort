@@ -40,10 +40,10 @@ void main() {
 	// get booleans for determining relative position and sorting order
 	float ascendingGroupBool = floatLessThan(floor(gl_FragCoord.y), floor(descendingStartCoord.y));
 	ascendingGroupBool      += floatEquals(floor(gl_FragCoord.y), floor(descendingStartCoord.y)) *
-						       floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));
-    float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
-	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) * 
-                               floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
+							   floatLessThan(floor(gl_FragCoord.x), floor(descendingStartCoord.x));
+	float firstTexelBool     = floatLessThan(floor(gl_FragCoord.y), floor(blockMiddleCoord.y));
+	firstTexelBool          += floatEquals(floor(gl_FragCoord.y), floor(blockMiddleCoord.y)) *
+							   floatLessThan(floor(gl_FragCoord.x), floor(blockMiddleCoord.x));
 
 	// get current data
 	vec4 localData = texture2D(u_bytes, vec2(gl_FragCoord.xy) / u_width);
